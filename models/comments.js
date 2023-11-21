@@ -11,36 +11,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   comments.init(
     {
-      commentsId: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
-      },
-      postId: {
-        type: DataTypes.INTEGER
-      },
-      userId: {
-        type: DataTypes.INTEGER
-      },
-      text: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      like: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0
-      },
-      createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-      },
-      updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-      }
+      postId: DataTypes.STRING,
+      userId: DataTypes.STRING,
+      text: DataTypes.STRING,
+      like: DataTypes.STRING
     },
     {
       sequelize,
