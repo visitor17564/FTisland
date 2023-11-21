@@ -1,24 +1,22 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class like extends Model {
+  class follow extends Model {
     static associate(models) {
       this.belongsTo(models.users, {
         targetKey: "userId",
-        foreignKey: "UserId"
+        foreignKey: "userId"
       });
     }
   }
-  like.init(
+  follow.init(
     {
-      userId: DataTypes.STRING,
-      targetId: DataTypes.STRING,
-      target_type: DataTypes.STRING
+      followId: DataTypes.STRING
     },
     {
       sequelize,
-      modelName: "like"
+      modelName: "follows"
     }
   );
-  return like;
+  return follow;
 };
