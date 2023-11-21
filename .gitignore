@@ -144,4 +144,6 @@ dist
 # Sequelize-auto 파일 감추기
 orm.js
 
+/config
+
 # End of https://www.toptal.com/developers/gitignore/api/node
