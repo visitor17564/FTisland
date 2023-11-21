@@ -1,0 +1,95 @@
+### 회원가입
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "email": "example@example.com",
+  "password": "102938",
+  "passwordConfirm": "102938",
+  "name": "관리자"
+}
+
+### 회원가입2
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "email": "asdfgh@hanmail.net",
+  "password": "102938",
+  "passwordConfirm": "102938",
+  "name": "해시"
+}
+
+### 회원가입3
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "email": "visitor6@hanmail.net",
+  "password": "102938",
+  "passwordConfirm": "102938",
+  "name": "사용자정보내놔6"
+}
+
+### 로그인
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "example@example.com",
+  "password": "102938"
+}
+
+### 로그인2
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "asdfg",
+  "password": "102938"
+}
+
+### 내 정보 조회
+GET http://localhost:3000/auth/my_page
+Content-Type: application/json
+
+### 상품등록
+POST http://localhost:3000/api/product
+Content-Type: application/json
+
+{
+  "title": "대방어",
+  "content": "맛있겠죠?"
+}
+
+### 상품등록
+POST http://localhost:3000/api/product
+Content-Type: application/json
+
+{
+  "title": "맛동산블랙",
+  "content": "갑자기먹고싶네"
+}
+
+
+### 상품목록조회
+GET http://localhost:3000/api/products
+Content-Type: application/json
+
+### 상품개별조회
+GET http://localhost:3000/api/product/2
+Content-Type: application/json
+
+### 상품수정
+PUT http://localhost:3000/api/product/2
+Content-Type: application/json
+
+{
+  "title": "훠궈2",
+  "content": "배부르죠?2",
+  "status": "SOLD_OUT"
+}
+
+### 상품삭제
+DELETE http://localhost:3000/api/product/2
+Content-Type: application/json
