@@ -1,5 +1,6 @@
 const express = require("express"); // express
 const { Users } = require("../models"); // Users모델 불러오기
+const { User_infos } = require("../models"); // users_infos 가져오기
 const authMiddleware = require("../middlewares/auth-middleware.js"); // 미들웨어연결
 const bcrypt = require("bcrypt"); // bcrypt 비밀번호 hash 라이브러리
 const saltRounds = 10; // bcrypt 비밀번호 hash 라이브러리, 확인을 위한 함수선언
@@ -74,7 +75,7 @@ router.put("/my_page", authMiddleware, async (req, res) => {
     );
 
     // 유효성검사 통과시 유저 추가정보 수정
-    await User_info.update(
+    await User_infos.update(
       { profile, username, region, nation },
       {
         where: {
