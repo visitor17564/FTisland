@@ -1,19 +1,26 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('user_infos', {
-      id: {
+    await queryInterface.createTable("user_infos", {
+      userId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: "users",
+          key: "userId"
+        },
+        onDelete: "CASCADE"
       },
       profile: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       username: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       region: {
         type: Sequelize.STRING
@@ -35,6 +42,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('user_infos');
+    await queryInterface.dropTable("user_infos");
   }
 };
