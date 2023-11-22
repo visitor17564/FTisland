@@ -1,11 +1,10 @@
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const postRouter = require("./routes/posts.js");
 
 // router import
 
-// const { errorHandler } = require("./middlewares/error.handler.js");
+const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
 const port = 3000;
 
@@ -17,7 +16,9 @@ app.use(cookieParser());
 // router middleware
 app.use("/api", postRouter);
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  const a = await Users.findAll();
+  console.log(a);
   res.send("Welcome");
 });
 
