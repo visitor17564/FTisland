@@ -119,10 +119,10 @@ router.post("/user/login", async (req, res) => {
   await Refresh_tokens.create({ token: refreshToken, userId: user.userId });
 
   // 생성한 Token 반환
+  res.cookie("authorization", { accessToken: `Bearer ${accessToken}`, refreshToken: `Bearer ${refreshToken}` });
   return res.status(200).json({
     success: true,
-    message: "로그인 되었습니다.",
-    data: { accessToken: `Bearer ${accessToken}`, refreshToken: `Bearer ${refreshToken}` }
+    message: "로그인 되었습니다."
   });
 });
 
