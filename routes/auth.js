@@ -70,7 +70,7 @@ router.post("user/signup", async (req, res) => {
 
 // 로그인 API
 // AccessToken만 다루고 후에 refreshToken까지 사용
-router.post("/auth/login", async (req, res) => {
+router.post("/user/signin", async (req, res) => {
     // 이메일, 비밀번호를 데이터로 넘겨받음
     const { email, password } = req.body;
   
