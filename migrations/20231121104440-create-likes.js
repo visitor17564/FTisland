@@ -1,28 +1,30 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('user_infos', {
-      id: {
+    await queryInterface.createTable("likes", {
+      likeId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      profile: {
-        type: Sequelize.STRING
+      UserId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "userId"
+        },
+        onDelete: "CASCADE"
       },
-      username: {
-        type: Sequelize.STRING
+      targetId: {
+        type: Sequelize.INTEGER,
+        allowNull: false
       },
-      region: {
-        type: Sequelize.STRING
-      },
-      nation: {
-        type: Sequelize.STRING
-      },
-      follow: {
-        type: Sequelize.STRING
+      target_type: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +37,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('user_infos');
+    await queryInterface.dropTable("likes");
   }
 };

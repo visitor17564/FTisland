@@ -1,4 +1,3 @@
-const express = require("express");
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
