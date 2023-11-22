@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 // users 모델 가져오기
 const { Users } = require("../models");
+// accessToken_Secret_key
+const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 
 // 회원가입 API
 router.post("user/signup", async (req, res) => {
@@ -95,11 +97,10 @@ router.post("/auth/login", async (req, res) => {
     }
   
     // 로그인 성공 시 JWT AccessToken을 생성
-    // secretKey부분은 후에 env를 써서 숨길 예정
     const accessToken = jwt.sign(
         // userId를 담고 있는 Payload
         { userId: user.userId },
-        "secretKey",
+        accessTokenSecretKey,
         // Token 유효기한 1시간 설정
         { expiresIn: "1h" }
     );
