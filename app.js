@@ -6,7 +6,7 @@ require("dotenv").config();
 
 // router import
 
-const { errorHandler } = require("./middlewares/error.handler.js");
+// const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
 const port = 3000;
 
