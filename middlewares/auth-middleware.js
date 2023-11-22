@@ -1,7 +1,7 @@
 // jwt모듈 가져오기
 const jwt = require("jsonwebtoken");
 // users 모델가져오기
-const { User } = require("../models");
+const { Users } = require("../models");
 
 // 사용자 인증 미들웨어
 module.exports = async (req, res, next) => {
@@ -27,7 +27,7 @@ module.exports = async (req, res, next) => {
     // secretKey부분 env로 숨길 예정
     const { userId } = jwt.verify(authToken, "secretKey");
     // 인증 성공 시 res.locals.user에 인증 된 사용자 정보를 담는다.
-    User.findByPk(userId).then((user) => {
+    Users.findByPk(userId).then((user) => {
         res.locals.user = user;
         next();
     });
