@@ -39,17 +39,30 @@ router.post("/posts", async (req, res) =>{
 //여행지 목록 조회
 router.get("/posts", async (req, res) => {
     try{
-        const post = await posts.findAll({
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+
+        const post = await posts.findAndCountAll({
             attributes: ["title","postId", "contents"],
             include: [{
                 model: users,
                 attributes: ["email"]
             }],
             order: [["createdAt", "DESC"]],
+            limit,
+            offset,
+             
         });
+        const totalPages = Math.ceil(post.count / limit);
+
         return res.status(200).json({
             success: true, 
-            "data": post
+            "data": post.rows,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+            }
         });
     }
     catch(err){
