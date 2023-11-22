@@ -1,6 +1,8 @@
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const postsRouter = require("./routes/posts.js");
+require("dotenv").config();
 
 // router import
 
@@ -14,7 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // router middleware
-app.use("/api", postRouter);
+app.use("/api", postsRouter);
 
 app.get("/", async (req, res) => {
   const a = await Users.findAll();
