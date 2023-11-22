@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 // users 모델 가져오기
 const { Users } = require("../models");
 // accessToken_Secret_key
+require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 
 // 회원가입 API

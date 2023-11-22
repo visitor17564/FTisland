@@ -2,6 +2,9 @@
 const jwt = require("jsonwebtoken");
 // users 모델가져오기
 const { Users } = require("../models");
+// accessToken_Secret_key
+require("dotenv").config();
+const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 
 // 사용자 인증 미들웨어
 module.exports = async (req, res, next) => {
@@ -25,7 +28,7 @@ module.exports = async (req, res, next) => {
     try {
     // 토큰 값 검증하는 과정. 복호화 및 검증
     // secretKey부분 env로 숨길 예정
-    const { userId } = jwt.verify(authToken, "secretKey");
+    const { userId } = jwt.verify(authToken, accessTokenSecretKey);
     // 인증 성공 시 res.locals.user에 인증 된 사용자 정보를 담는다.
     Users.findByPk(userId).then((user) => {
         res.locals.user = user;
