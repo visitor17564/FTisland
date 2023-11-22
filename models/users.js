@@ -1,29 +1,29 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class users extends Model {
+  class Users extends Model {
     static associate(models) {
-      this.hasOne(models.user_infos, {
+      this.hasOne(models.User_infos, {
         sourceKey: "userId",
         foreignKey: "userId"
       });
 
-      this.hasMany(models.likes, {
+      this.hasMany(models.Likes, {
         sourceKey: "userId",
         foreignKey: "UserId"
       });
 
-      this.hasMany(models.follows, {
+      this.hasMany(models.Follows, {
         sourceKey: "userId",
         foreignKey: "userId"
       });
-      this.hasMany(models.posts, {
+      this.hasMany(models.Posts, {
         sourceKey: "userId",
         foreignKey: "userId"
       });
     }
   }
-  users.init(
+  Users.init(
     {
       userId: {
         allowNull: false,
@@ -43,8 +43,9 @@ module.exports = (sequelize, DataTypes) => {
       googleId: {
         type: DataTypes.STRING
       },
-      profile: {
-        type: DataTypes.STRING
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -59,8 +60,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "users"
+      modelName: "Users"
     }
   );
-  return users;
+  return Users;
 };

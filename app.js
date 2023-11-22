@@ -1,10 +1,10 @@
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
-
+const { Users } = require("./models");
 // router import
 
-const { errorHandler } = require("./middlewares/error.handler.js");
+//const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
 const port = 3000;
 
@@ -12,17 +12,18 @@ const port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(flash());
 
 // router middleware
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  const a = await Users.findAll();
+  console.log(a);
   res.send("Welcome");
 });
 
-app.use((err, req, res, next) => {
-  errorHandler(err.message, req, res);
-});
+// app.use((err, req, res, next) => {
+//   errorHandler(err.message, req, res);
+// });
 
 app.listen(port, () => {
   console.log(port, "listening on port " + port);
