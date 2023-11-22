@@ -49,7 +49,7 @@ router.post("/user/signup", async (req, res) => {
     });
 
     // 중복된 이메일 입력 확인
-    if (existEmail) {
+    if (existEmail.length > 0) {
         return res.status(409).send({
             success: false,
             errorMessage: "해당 이메일은 이미 사용 중입니다."
@@ -70,7 +70,7 @@ router.post("/user/signup", async (req, res) => {
 
 // 로그인 API
 // AccessToken만 다루고 후에 refreshToken까지 사용
-router.post("/user/signin", async (req, res) => {
+router.post("/user/login", async (req, res) => {
     // 이메일, 비밀번호를 데이터로 넘겨받음
     const { email, password } = req.body;
   
