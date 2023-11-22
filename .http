@@ -1,42 +1,22 @@
+@port=http://localhost:3000
+
 ### 회원가입
-POST http://localhost:3000/auth/signup
+POST {{port}}/api/user/signup
 Content-Type: application/json
 
 {
-  "email": "example@example.com",
+  "email": "jci17564@example.com",
   "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "관리자"
-}
-
-### 회원가입2
-POST http://localhost:3000/auth/signup
-Content-Type: application/json
-
-{
-  "email": "asdfgh@hanmail.net",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "해시"
-}
-
-### 회원가입3
-POST http://localhost:3000/auth/signup
-Content-Type: application/json
-
-{
-  "email": "visitor6@hanmail.net",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "사용자정보내놔6"
+  "confirmPassword": "102938",
+  "username": "정창일"
 }
 
 ### 로그인
-POST http://localhost:3000/auth/login
+POST {{port}}/api/user/login
 Content-Type: application/json
 
 {
-  "email": "example@example.com",
+  "email": "jci17564@example.com",
   "password": "102938"
 }
 
