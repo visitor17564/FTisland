@@ -3,6 +3,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { Users } = require("./models");
 // router import
+const authRouter = require("./routes/auth.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // router middleware
+app.use("/api", [authRouter]);
 
 app.get("/", async (req, res) => {
   const a = await Users.findAll();
