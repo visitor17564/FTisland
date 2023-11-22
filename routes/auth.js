@@ -13,7 +13,7 @@ require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 
 // 회원가입 API
-router.post("user/signup", async (req, res) => {
+router.post("/user/signup", async (req, res) => {
     // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
     const { email, username, password, confirmPassword } = req.body;
 
@@ -60,11 +60,11 @@ router.post("user/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
   
     // 회원가입 성공 시 정보 반환
-    await Users.create({ email, nickname, password: hashedPassword });
+    await Users.create({ email, username, password: hashedPassword });
     res.status(201).json({
         success: true,
         message: "회원가입 되신 것을 축하드립니다!",
-        data: { email, nickname }
+        data: { email, username }
     });
 })
 
