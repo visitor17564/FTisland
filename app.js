@@ -5,8 +5,11 @@ const { Users } = require("./models");
 // router import
 const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
+<<<<<<< HEAD
 
 const path = require("path");
+=======
+>>>>>>> 51c3fc9bf56d1a242ae1ecb39f092f86fd37054a
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
