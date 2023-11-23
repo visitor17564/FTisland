@@ -1,11 +1,11 @@
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const { Users } = require("./models");
-// router import
+const postsRouter = require("./routes/posts.js");
 const authRouter = require("./routes/auth.js");
-const mypageRouter = require("./routes/mypage.js");
-const followRouter = require("./routes/follows.js");
+require("dotenv").config();
+
+// router import
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -17,11 +17,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // router middleware
-app.use("/api", [authRouter, mypageRouter, followRouter]);
-
+app.use("/api", [postsRouter, authRouter]);
+// })
 app.get("/", async (req, res) => {
-  const a = await Users.findAll();
-  console.log(a);
+  const users = await users.findAll();
+  console.log(users);
   res.send("Welcome");
 });
 
@@ -30,5 +30,5 @@ app.get("/", async (req, res) => {
 // });
 
 app.listen(port, () => {
-  console.log(port, "listening on port " + port);
+  console.log(port, " 서버가 열렸습니다. " + port);
 });
