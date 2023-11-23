@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+
+  <div class="container ">
+    <div class=" row">
+      <div class="col-2">
+        <div class="card">
+          <div class="card-header">
+            지역
+          </div>
+          <ul class=" list-group list-group-flush">
+            <% regions.forEach((region)=> { %>
+              <%- include('../partials/region',{region : region }) %>
+                <% }) %>
+          </ul>
+        </div>
+      </div>
+      <div class="col-10  align-items-center">
+        <% posts.forEach((post)=> { %>
+          <div class="card mb-3">
+            <%- include('../partials/card') %>
+          </div>
+          <% }) %>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <%- include('../partials/footer') %>

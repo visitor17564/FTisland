@@ -4,7 +4,9 @@ const cookieParser = require("cookie-parser");
 const { Users } = require("./models");
 // router import
 const authRouter = require("./routes/auth.js");
-const mypageRouter = require("./routes/mypage.js"); 
+const mypageRouter = require("./routes/mypage.js");
+
+const path = require("path");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -15,13 +17,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+const publicDirectoryPath = path.join(__dirname, "public");
+app.use(express.static(publicDirectoryPath));
+const temp = ["서울", "경기", "인천", "강원"];
 // router middleware
 app.use("/api", [authRouter, mypageRouter]);
 
 app.get("/", async (req, res) => {
-  const a = await Users.findAll();
-  console.log(a);
-  res.send("Welcome");
+  res.render("posts", {
+    regions: temp,
+    posts: temp
+  });
 });
 
 // app.use((err, req, res, next) => {
