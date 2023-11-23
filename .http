@@ -1,31 +1,46 @@
 @port=http://localhost:3000
-@accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTcwMDY2NzU3OSwiZXhwIjoxNzAwNjcxMTc5fQ.-bcKSh4KaWQkFqDwyNdG8c2YpR7yRmJreEzEsPkmTyo
-@refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTcwMDY2NTI5NSwiZXhwIjoxNzAwNzUxNjk1fQ.Sbd2zpNqmK12upFIv39Na1lVXN36EpAh8PGW4sDUyCI
-
+@accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDcxOTg5MSwiZXhwIjoxNzAwNzIzNDkxfQ.xiN_hyPxj8GO3n5Ymam3oPywBae3M_g2_nygAZUPpIg
+@refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDcxOTg5MSwiZXhwIjoxNzAwODA2MjkxfQ.e4a_7ECOTdS3xw9zfthtI_kgyor8TwAZof7vA0RQyso
 ### 회원가입
-POST {{port}}/api/user/signup
+POST {{port}}/api/auth/signup
 Content-Type: application/json
 
 {
-  "email": "jci17564@example.com",
-  "password": "102938",
-  "confirmPassword": "102938",
-  "username": "정창일"
+  "email": "test@example.com",
+  "password": "test123",
+  "confirmPassword": "test123",
+  "username": "관리자"
 }
 
 ### 로그인
-POST {{port}}/api/user/login
+POST {{port}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "jci17564@example.com",
-  "password": "102938"
+  "email": "test@example.com",
+  "password": "test123"
 }
 
+### 로그아웃
+GET http://localhost:3000/api/auth/logout
+
+Content-Type: application/json
 ### 내 정보 조회
-GET {{port}}/api/my_page
+GET {{port}}/api/user/me
 Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
+
+### 내 정보 수정
+PUT {{port}}/api/user/me
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
+Content-Type: application/json
+
+{
+  "profile": "프로필변경테스트",
+  "region": "지역변경테스트",
+  "nation": "국가변경테스트",
+  "follow": "팔로우변경테스트"
+}
 
 ### 상품등록
 POST http://localhost:3000/api/product
@@ -44,7 +59,6 @@ Content-Type: application/json
   "title": "맛동산블랙",
   "content": "갑자기먹고싶네"
 }
-
 
 ### 상품목록조회
 GET http://localhost:3000/api/products
