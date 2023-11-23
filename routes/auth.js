@@ -15,7 +15,7 @@ const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 회원가입 API
 router.post("/auth/signup", async (req, res) => {
-    // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
+    // 이메일, 유저네임, 비밀번호, 확인용 비밀번호를 데이터로 넘겨받음
     const { email, username, password, confirmPassword } = req.body;
 
   // 빈 입력란 여부 체크
@@ -70,7 +70,6 @@ router.post("/auth/signup", async (req, res) => {
 });
 
 // 로그인 API
-// AccessToken만 다루고 후에 refreshToken까지 사용
 router.post("/auth/login", async (req, res) => {
   // 이메일, 비밀번호를 데이터로 넘겨받음
   const { email, password } = req.body;
@@ -111,7 +110,7 @@ router.post("/auth/login", async (req, res) => {
     // userId를 담고 있는 Payload
     { userId: user.userId },
     refreshTokenSecretKey,
-    // Token 유효기한 1시간 설정
+    // Token 유효기한 1일 설정
     { expiresIn: "1d" }
   );
 
