@@ -1,19 +1,20 @@
-// express모듈 가져오기
+// 모듈 가져오기
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 // express모듈에서 router 가져오기
 const router = express.Router();
-// jwt모듈 가져오기
-const jwt = require("jsonwebtoken");
-// bcrypt모듈 가져오기, 비밀번호 암호화(hash)
-const bcrypt = require("bcrypt");
+
 // users 모델 가져오기
-const { Users } = require("../models");
+const { Users, Refresh_tokens } = require("../models");
 // accessToken_Secret_key
 require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
+const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 회원가입 API
-router.post("/user/signup", async (req, res) => {
+router.post("user/signup", async (req, res) => {
   // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
   const { email, username, password, confirmPassword } = req.body;
 
@@ -44,7 +45,7 @@ router.post("/user/signup", async (req, res) => {
   }
 
   // 이메일이 중복되는지 확인하기 위해 가져온다.
-  const existEmail = await Users.findOne({
+  const existEmail = await Users.findAll({
     where: { email }
   });
 
