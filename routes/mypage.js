@@ -22,26 +22,58 @@ const comparePassword = async (password, hash) => {
   return false;
 };
 
+// 사용자 정보 생성 API
+router.post("/user/me", authMiddleware, async (req, res) => {
+  try {
+    const { userId } = res.locals.user;
+    const { profile, region, nation, follow } = req.body;
+
+    // 빈 입력란 여부 체크
+    if (!profile || !region || !nation || !follow) {
+      return res.status(401).send({
+        success: false,
+        errorMessage: "입력란 중 비어있는 곳이 있습니다."
+      });
+    }
+
+    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
+    const user_info = await User_infos.findOne({
+      where: {userId : userId }
+    });
+
+    // 사용자 정보가 존재하지 않으면 새로운 사용자 정보를 생성한다.
+    if (!user_info) {
+      await User_infos.create({
+        profile: profile,
+        region: region,
+        nation: nation,
+        follow: follow
+      })
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "프로필 생성이 완료되었습니다.",
+      data : user_info
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      errorMessage: "예기치 못한 오류가 발생하였습니다."
+    });
+    console.log(err);
+  }
+})
+
 // 사용자 정보 조회 API
 router.get("/user/me", authMiddleware, async (req, res) => {
   try {
-    // 테스트용 userInfo
-    const testUserInfo = {
-      userId: res.locals.user.userId,
-      profile: "프로필테스트",
-      region: "지역테스트",
-      nation: "국가테스트",
-      follow: "팔로우테스트"
-    };
-    // 모델에 테스트용 정보 추가
-    // create로 생성하고 모델에 추가를 했더니 아래와 같은 에러 발생
-    // Duplicate entry '3' for key 'User_infos.PRIMARY
-    // 기존에 userId 3이라는 값이 존재하여 upsert를 이용하여 update하여 문제해결
-    await User_infos.upsert(testUserInfo, { where: { userId: res.locals.user.userId } });
-
+    const { userId } = res.locals.user;
+    
     // user와 user_info의 id가 일치하는 것을 찾는다.
     const user = await Users.findOne({
-        where: { userId : res.locals.user.userId },
+        where: { userId : userId },
         // user모델에서 password 부분을 제외한다.
         attributes: { exclude: ["password"] },
         // user_infos모델의 프로필, 지역, 국가, 팔로우를 선택하고 포함한다.
@@ -54,14 +86,17 @@ router.get("/user/me", authMiddleware, async (req, res) => {
         success: false,
         errorMessage: "회원 조회에 실패하였습니다." 
       })
-    }
+    };
     
     // 사용자 정보 보여주기
     return res.status(200).json({
       success: true,
       data: user });
   } catch (err) {
-    res.status(500).json({ success: false, Message: "예기치 못한 오류가 발생하였습니다." });
+    res.status(500).json({
+      success: false,
+      errorMessage: "예기치 못한 오류가 발생하였습니다."
+    });
     console.log(err);
   }
 });
@@ -69,7 +104,7 @@ router.get("/user/me", authMiddleware, async (req, res) => {
 // 사용자 정보 수정 API
 router.put("/user/me", authMiddleware, async (req, res) => {
   try {
-    
+
   } catch (err) {
     res.status(500).json({ success: false, message: "예기치 못한 오류가 발생하였습니다." });
     console.log(err);
