@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
   <div class="auth-wrapper">
-    <form method="POST" action="/auth/signup">
+    <form method="POST" action="/api/auth/signup">
       <div class="text-center">
         <h3 class="mb-3 font-weight-normal">회원가입</h3>
       </div>
@@ -11,6 +11,10 @@
       <div class="mb-3">
         <label for="password">Password</label>
         <input type="password" class="form-control" id="password" name="password" required>
+      </div>
+      <div class="mb-3">
+        <label for="password">ConfirmPassword</label>
+        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
       </div>
       <div class="mb-3">
         <label for="username">Username</label>

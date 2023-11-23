@@ -5,11 +5,9 @@ const { Users } = require("./models");
 // router import
 const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
-<<<<<<< HEAD
 
 const path = require("path");
-=======
->>>>>>> 51c3fc9bf56d1a242ae1ecb39f092f86fd37054a
+const mainRouter = require("./routes/main.router.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -26,6 +24,7 @@ const publicDirectoryPath = path.join(__dirname, "public");
 app.use(express.static(publicDirectoryPath));
 const temp = ["서울", "경기", "인천", "강원"];
 // router middleware
+app.use("/", mainRouter);
 app.use("/api", [authRouter, mypageRouter]);
 
 app.get("/", async (req, res) => {
