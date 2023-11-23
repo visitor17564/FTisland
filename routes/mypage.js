@@ -22,9 +22,8 @@ const comparePassword = async (password, hash) => {
   return false;
 };
 
-
 // 사용자 정보 조회 API
-router.get("/my_page", authMiddleware, async (req, res) => {
+router.get("/user/me", authMiddleware, async (req, res) => {
   try {
     // 테스트용 userInfo
     const testUserInfo = {
@@ -47,7 +46,7 @@ router.get("/my_page", authMiddleware, async (req, res) => {
         attributes: { exclude: ["password"] },
         // user_infos모델의 프로필, 지역, 국가, 팔로우를 선택하고 포함한다.
         include: [{ model: User_infos, attributes: ["profile", "region", "nation", "follow"] }],
-    })
+    });
 
     // 유저가 없는 경우
     if (!user) {
@@ -63,6 +62,16 @@ router.get("/my_page", authMiddleware, async (req, res) => {
       data: user });
   } catch (err) {
     res.status(500).json({ success: false, Message: "예기치 못한 오류가 발생하였습니다." });
+    console.log(err);
+  }
+});
+
+// 사용자 정보 수정 API
+router.put("/user/me", authMiddleware, async (req, res) => {
+  try {
+    
+  } catch (err) {
+    res.status(500).json({ success: false, message: "예기치 못한 오류가 발생하였습니다." });
     console.log(err);
   }
 });
