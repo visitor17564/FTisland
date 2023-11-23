@@ -1,56 +1,30 @@
+@port=http://localhost:3000
+@accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTcwMDY2NzU3OSwiZXhwIjoxNzAwNjcxMTc5fQ.-bcKSh4KaWQkFqDwyNdG8c2YpR7yRmJreEzEsPkmTyo
+@refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTcwMDY2NTI5NSwiZXhwIjoxNzAwNzUxNjk1fQ.Sbd2zpNqmK12upFIv39Na1lVXN36EpAh8PGW4sDUyCI
+
 ### 회원가입
-POST http://localhost:3000/auth/signup
+POST {{port}}/api/user/signup
 Content-Type: application/json
 
 {
-  "email": "example@example.com",
+  "email": "jci17564@example.com",
   "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "관리자"
-}
-
-### 회원가입2
-POST http://localhost:3000/auth/signup
-Content-Type: application/json
-
-{
-  "email": "asdfgh@hanmail.net",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "해시"
-}
-
-### 회원가입3
-POST http://localhost:3000/auth/signup
-Content-Type: application/json
-
-{
-  "email": "visitor6@hanmail.net",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "사용자정보내놔6"
+  "confirmPassword": "102938",
+  "username": "정창일"
 }
 
 ### 로그인
-POST http://localhost:3000/auth/login
+POST {{port}}/api/user/login
 Content-Type: application/json
 
 {
-  "email": "example@example.com",
-  "password": "102938"
-}
-
-### 로그인2
-POST http://localhost:3000/auth/login
-Content-Type: application/json
-
-{
-  "email": "asdfg",
+  "email": "jci17564@example.com",
   "password": "102938"
 }
 
 ### 내 정보 조회
-GET http://localhost:3000/auth/my_page
+GET {{port}}/api/my_page
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 ### 상품등록
