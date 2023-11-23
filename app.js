@@ -2,10 +2,11 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const postsRouter = require("./routes/posts.js");
+const authRouter = require("./routes/auth.js");
 require("dotenv").config();
 
 // router import
-const authorization = require("./middlewares/post-middleware.js")
+// const authorization = require("./middlewares/post-middleware.js");
 // const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
 const port = 3000;
@@ -16,8 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // router middleware
-app.use("/api", postsRouter);
-
+app.use("/api", [postsRouter, authRouter]);
 
 // router.get("/posts", authorization, async (req, res) => {
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { posts, users } = require("../models");
-const Comment = require("../models/comments");
+const { Posts, Users, Comment } = require("../models");
+// const Comment = require("../models/comments");
 const Post = require("../models/posts");
 
 //여행지 등록
@@ -14,7 +14,7 @@ router.post("/posts", async (req, res) => {
         message: "데이터형식이 올바르지 않습니다."
       });
     }
-    const post = new posts({
+    const post = new Posts({
       userId: 1,
       title,
       subtitle,
@@ -28,7 +28,7 @@ router.post("/posts", async (req, res) => {
       message: "관광지를 등록하였습니다."
     });
   } catch (err) {
-    return res.status(400).json({
+    return res.status(500).json({
       success: false,
       message: "관광지 등록에 실패하였습니다."
     });
@@ -42,11 +42,11 @@ router.get("/posts", async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    const post = await posts.findAndCountAll({
+    const post = await Posts.findAndCountAll({
       attributes: ["title", "postId", "contents"],
       include: [
         {
-          model: users,
+          model: Users,
           attributes: ["email"]
         }
       ],
@@ -65,6 +65,7 @@ router.get("/posts", async (req, res) => {
       }
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       success: false,
       message: "관광지를 조회할 수 없습니다."
@@ -76,12 +77,12 @@ router.get("/posts", async (req, res) => {
 router.get("/posts/:postId", async (req, res) => {
   try {
     const postId = req.params.postId;
-    const post = await posts.findOne({
+    const post = await Posts.findOne({
       where: { postId },
       attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state"],
       include: [
         {
-          model: users,
+          model: Users,
           attributes: ["email"]
         }
       ]
@@ -115,7 +116,7 @@ router.put("/posts/:postId", async (req, res) => {
         message: "데이터형식이 올바르지 않습니다."
       });
     }
-    const post = await posts.findOne({ postId });
+    const post = await Posts.findOne({ postId });
 
     if (!post.dataValues) {
       return res.status(401).json({
@@ -156,7 +157,7 @@ router.put("/posts/:postId", async (req, res) => {
 router.delete("/posts/:postId", async (req, res) => {
   try {
     const postId = req.params.postId;
-    const post = await posts.findOne({ postId });
+    const post = await Posts.findOne({ postId });
 
     if (!post.dataValues) {
       return res.status(500).json({
@@ -181,7 +182,6 @@ router.delete("/posts/:postId", async (req, res) => {
         });
       });
   } catch (err) {
-    console.log(err);
     return res.status(400).json({
       success: false,
       message: "서버오류."
@@ -194,18 +194,21 @@ router.post("/posts/:postId/comments", async (req, res) => {
   const postId = req.params.postId;
   const { content, userId } = req.body;
   try {
-    const post = await Post.findByPk(postId);
+    const post = await Posts.findByPk(postId);
     if (!post) {
       return res.status(404).json({
+        success: false,
         message: "포스트를 찾을 수 없습니다."
       });
     }
     const comment = await Comment.create({ content, userId, postId });
     res.status(201).json({
+      success: true,
       message: "댓글이 등록되었습니다.",
       comment
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       message: "서버 오류."
     });
