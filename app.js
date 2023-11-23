@@ -1,13 +1,9 @@
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const { Users } = require("./models");
-// router import
+const postsRouter = require("./routes/posts.js");
 const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
-
-const path = require("path");
-const mainRouter = require("./routes/main.router.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -24,14 +20,12 @@ const publicDirectoryPath = path.join(__dirname, "public");
 app.use(express.static(publicDirectoryPath));
 const temp = ["서울", "경기", "인천", "강원"];
 // router middleware
-app.use("/", mainRouter);
 app.use("/api", [authRouter, mypageRouter]);
 
 app.get("/", async (req, res) => {
-  res.render("posts", {
-    regions: temp,
-    posts: temp
-  });
+  const a = await Users.findAll();
+  console.log(a);
+  res.send("Welcome");
 });
 
 // app.use((err, req, res, next) => {
@@ -39,5 +33,5 @@ app.get("/", async (req, res) => {
 // });
 
 app.listen(port, () => {
-  console.log(port, "listening on port " + port);
+  console.log(port, " 서버가 열렸습니다. " + port);
 });

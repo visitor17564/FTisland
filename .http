@@ -81,3 +81,36 @@ Content-Type: application/json
 ### 상품삭제
 DELETE http://localhost:3000/api/product/2
 Content-Type: application/json
+
+### 내가 팔로우하는 사람
+GET {{port}}/api/user/my_follows
+Content-Type: application/json
+
+### 나를 팔로우하는 사람
+GET {{port}}/api/user/my_followers
+Content-Type: application/json
+
+### 로그인2
+POST {{port}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "visitor@example.com",
+  "password": "102938"
+}
+
+### follow버튼 누르기
+POST {{port}}/api/user/my_follows
+Content-Type: application/json
+
+{
+  "targetId" : 2
+}
+
+### follow취소 누르기
+DELETE {{port}}/api/user/my_follows
+Content-Type: application/json
+
+{
+  "targetId" : 2
+}

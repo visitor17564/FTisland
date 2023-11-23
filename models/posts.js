@@ -1,5 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
+// const sequelize = require("../config/(데이터 베이스가 어디지?")
+
 module.exports = (sequelize, DataTypes) => {
   class Posts extends Model {
     static associate(models) {
