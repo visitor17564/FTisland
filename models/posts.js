@@ -1,5 +1,24 @@
 "use strict";
 const { Model } = require("sequelize");
+// const sequelize = require("../config/(데이터 베이스가 어디지?")
+const Comment = require("./comments");
+const User = require("./users")
+
+const Post = sequelize.define('Post', {
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  content: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+});
+
+Post.belongsTo(User);
+Post.hasMany(Comment);
+Comment.belongsTo(Post);
+
 module.exports = (sequelize, DataTypes) => {
   class Posts extends Model {
     static associate(models) {
