@@ -128,17 +128,14 @@ router.post("/auth/login", async (req, res) => {
 
 // 로그아웃 API
 router.get("/auth/logout", (req, res, next) => {
-    // accessToken을 초기화 한다.
-    res.clearCookie('accessToken');
-    
-    // 클라이언트를 로그인 경로로 리다이렉트 한다.
-    res.redirect("/auth/login");
+    // Token을 초기화 한다.
+    res.clearCookie("authorization");
 
-    return res.status(200).json({
-        success: true,
-        message: "로그아웃 되었습니다."
-    })
-})
+  return res.status(200).json({
+    success: true,
+    message: "로그아웃 되었습니다."
+    });
+});
 
 // router 모듈 내보내기
 module.exports = router;
