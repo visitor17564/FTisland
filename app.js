@@ -5,7 +5,7 @@ const postsRouter = require("./routes/posts.js");
 require("dotenv").config();
 
 // router import
-
+const authorization = require("./middlewares/post-middleware.js")
 // const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
 const port = 3000;
@@ -18,9 +18,13 @@ app.use(cookieParser());
 // router middleware
 app.use("/api", postsRouter);
 
+
+// router.get("/posts", authorization, async (req, res) => {
+
+// })
 app.get("/", async (req, res) => {
-  const a = await Users.findAll();
-  console.log(a);
+  const users = await users.findAll();
+  console.log(users);
   res.send("Welcome");
 });
 
@@ -29,5 +33,5 @@ app.get("/", async (req, res) => {
 // });
 
 app.listen(port, () => {
-  console.log(port, "listening on port " + port);
+  console.log(port, " 서버가 열렸습니다. " + port);
 });

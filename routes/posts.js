@@ -162,7 +162,7 @@ router.delete("/posts/:postId", async (req, res) => {
         //         success: false,
         //         message: "관광지를 삭제할 권한이 존재하지 않습니다."
         //     });
-        // } 지금 JWT 토큰이 존재하지 않기 때문에 검증을 하지 못한다.
+        // } 
         post.destroy({
             where : { postId }
         }).then(() => {
