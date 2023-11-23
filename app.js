@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const { Users } = require("./models");
 // router import
 const authRouter = require("./routes/auth.js");
-const mypageRouter = require("./routes/mypage.js"); 
+const mypageRouter = require("./routes/mypage.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
