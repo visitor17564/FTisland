@@ -10,11 +10,10 @@ const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 module.exports = async (req, res, next) => {
      //req.headers를 통한 authorization 전달받기
     const { authorization } = req.headers;
-
+ 
     // split를 통해 분리 기준은 " "으로한다.
     // 배열구조분해할당으로 authType, authToken으로 각각 할당한다.
     const [authType, authToken] = (authorization || "").split(" ");
-
     // authType이 Bearer가 아니거나 빈값일 때 예외처리
     if (!authToken || authType !== "Bearer") {
         res.status(401).send({
@@ -27,7 +26,6 @@ module.exports = async (req, res, next) => {
     // 서버를 꺼지는 것을 방지하기 위해 try catch 사용
     try {
     // 토큰 값 검증하는 과정. 복호화 및 검증
-    // secretKey부분 env로 숨길 예정
     const { userId } = jwt.verify(authToken, accessTokenSecretKey);
     // 인증 성공 시 res.locals.user에 인증 된 사용자 정보를 담는다.
     Users.findByPk(userId).then((user) => {
