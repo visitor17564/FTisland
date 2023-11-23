@@ -104,8 +104,8 @@ router.get("/user/me", authMiddleware, async (req, res) => {
 // 사용자 정보 수정 API
 router.put("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.locals.user;
-    const { profile, region, nation, follow, password, confirmPassword } = req.body;
+    const { userId, password } = res.locals.user;
+    const { profile, region, nation, follow, confirmPassword } = req.body;
 
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
     const user_info = await User_infos.findOne({
@@ -120,22 +120,23 @@ router.put("/user/me", authMiddleware, async (req, res) => {
       })
     }
 
+    // 비밀번호 비교
+    const hash = password;
+    const isValidPass = await comparePassword(confirmPassword, hash);
     // 비밀번호가 서로 일치하지 않는 경우
-    if (password !== confirmPassword) {
-      return res.status(400).json({
+    if (!isValidPass) {
+      return res.status(401).json({
         success: false,
         errorMessage: "비밀번호가 서로 일치하지 않습니다."
       });
     }
 
     // 비밀번호가 일치할 경우 사용자 정보 수정
-    if (password === confirmPassword) {
-      await User_infos.update(
-        { profile, region, nation, follow },
-        { where: { userId: userId }}
-      );
-    }
-   
+    await User_infos.update(
+      { profile, region, nation, follow },
+      { where: { userId: userId }}
+    );
+    
     res.status(200).json({
       success: true,
       message: "사용자 정보 수정이 완료되었습니다."
@@ -147,18 +148,19 @@ router.put("/user/me", authMiddleware, async (req, res) => {
   }
 });
 
-// router.delete("/my_page", authMiddleware, async (req, res) => {
+// 사용자 정보 삭제
+// router.delete("/user/me", authMiddleware, async (req, res) => {
 //   try {
 //     // 구조분해할당
-//     const { id } = res.locals.user;
-//     const { password } = req.body;
+//      const { id } = res.locals.user;
+//      const { password } = req.body;
 
-//     // 일단 상품 조회
-//     const user = await Users.findOne({
-//       where: {
-//         userId: userId
-//       }
-//     });
+//      // 일단 상품 조회
+//      const user = await Users.findOne({
+//        where: {
+//          userId: userId
+//        }
+//      });
 
 //     // 유저가 없을 경우
 //     if (!user) {
