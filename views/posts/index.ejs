@@ -15,6 +15,10 @@
         </div>
       </div>
       <div class="col-10  align-items-center">
+        <div class="mb-5">
+          <%- include('../partials/write.ejs') %>
+        </div>
+
         <% posts.forEach((post)=> { %>
           <div class="card mb-3">
             <%- include('../partials/card') %>
@@ -24,7 +28,9 @@
     </div>
   </div>
 
+  <div class="container">
+    <%- include('../partials/post.item.ejs') %>
+  </div>
+  <%- include('../partials/post_modal') %>
 
-
-
-  <%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>

@@ -11,7 +11,10 @@ mainRouter.get("/signup", (req, res) => {
 });
 
 mainRouter.get("/post", (req, res) => {
-  res.render("posts");
+  res.render("posts", {
+    regions: temp,
+    posts: temp
+  });
 });
 
 module.exports = mainRouter;
