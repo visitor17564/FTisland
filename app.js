@@ -5,6 +5,7 @@ const { Users } = require("./models");
 // router import
 const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
+const followRouter = require("./routes/follows.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -16,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // router middleware
-app.use("/api", [authRouter, mypageRouter]);
+app.use("/api", [authRouter, mypageRouter, followRouter]);
 
 app.get("/", async (req, res) => {
   const a = await Users.findAll();
