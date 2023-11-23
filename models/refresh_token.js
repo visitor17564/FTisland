@@ -1,17 +1,22 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Follow extends Model {
+  class Refresh_tokens extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
     static associate(models) {
       this.belongsTo(models.Users, {
-        targetKey: "userId",
-        foreignKey: "userId"
+        targetKey: "userId", // 3. Users 모델의 userId 컬럼을
+        foreignKey: "userId" // 4. UserInfos 모델의 UserId 컬럼과 연결합니다.
       });
     }
   }
-  Follow.init(
+  Refresh_tokens.init(
     {
-      followId: {
+      tokenId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -26,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         onDelete: "CASCADE"
       },
+      token: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE
@@ -33,16 +42,12 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE
-      },
-      targetId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
       }
     },
     {
       sequelize,
-      modelName: "Follows"
+      modelName: "Refresh_tokens"
     }
   );
-  return Follow;
+  return Refresh_tokens;
 };

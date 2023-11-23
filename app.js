@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // router middleware
-
+app.use("/api", [postsRouter, authRouter]);
 // })
 app.get("/", async (req, res) => {
   const users = await users.findAll();

@@ -14,7 +14,7 @@ const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 회원가입 API
-router.post("user/signup", async (req, res) => {
+router.post("/user/signup", async (req, res) => {
   // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
   const { email, username, password, confirmPassword } = req.body;
 
