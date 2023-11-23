@@ -41,25 +41,26 @@ router.get("/user/me", authMiddleware, async (req, res) => {
 
     // user와 user_info의 id가 일치하는 것을 찾는다.
     const user = await Users.findOne({
-        where: { userId : res.locals.user.userId },
-        // user모델에서 password 부분을 제외한다.
-        attributes: { exclude: ["password"] },
-        // user_infos모델의 프로필, 지역, 국가, 팔로우를 선택하고 포함한다.
-        include: [{ model: User_infos, attributes: ["profile", "region", "nation", "follow"] }],
+      where: { userId: res.locals.user.userId },
+      // user모델에서 password 부분을 제외한다.
+      attributes: { exclude: ["password"] },
+      // user_infos모델의 프로필, 지역, 국가, 팔로우를 선택하고 포함한다.
+      include: [{ model: User_infos, attributes: ["profile", "region", "nation", "follow"] }]
     });
 
     // 유저가 없는 경우
     if (!user) {
       res.status(404).send({
         success: false,
-        errorMessage: "회원 조회에 실패하였습니다." 
-      })
+        errorMessage: "회원 조회에 실패하였습니다."
+      });
     }
-    
+
     // 사용자 정보 보여주기
     return res.status(200).json({
       success: true,
-      data: user });
+      data: user
+    });
   } catch (err) {
     res.status(500).json({ success: false, Message: "예기치 못한 오류가 발생하였습니다." });
     console.log(err);
@@ -69,7 +70,6 @@ router.get("/user/me", authMiddleware, async (req, res) => {
 // 사용자 정보 수정 API
 router.put("/user/me", authMiddleware, async (req, res) => {
   try {
-    
   } catch (err) {
     res.status(500).json({ success: false, message: "예기치 못한 오류가 발생하였습니다." });
     console.log(err);

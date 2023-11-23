@@ -1,11 +1,9 @@
 // import
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const { Users } = require("./models");
-// router import
+const postsRouter = require("./routes/posts.js");
 const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
-const followRouter = require("./routes/follows.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const app = express();
@@ -16,8 +14,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+const publicDirectoryPath = path.join(__dirname, "public");
+app.use(express.static(publicDirectoryPath));
+const temp = ["서울", "경기", "인천", "강원"];
 // router middleware
-app.use("/api", [authRouter, mypageRouter, followRouter]);
+app.use("/api", [authRouter, mypageRouter]);
 
 app.get("/", async (req, res) => {
   const a = await Users.findAll();
@@ -30,5 +33,5 @@ app.get("/", async (req, res) => {
 // });
 
 app.listen(port, () => {
-  console.log(port, "listening on port " + port);
+  console.log(port, " 서버가 열렸습니다. " + port);
 });

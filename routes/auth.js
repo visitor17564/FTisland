@@ -15,14 +15,14 @@ const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 회원가입 API
 router.post("/auth/signup", async (req, res) => {
-    // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
-    const { email, username, password, confirmPassword } = req.body;
+  // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
+  const { email, username, password, confirmPassword } = req.body;
 
   // 빈 입력란 여부 체크
   if (!email || !username || !password || !confirmPassword) {
     return res.status(401).send({
       success: false,
-      errorMessage: "입력란 중 비어있는 곳이 있습니다."
+      errorMessage: "입력란 중 비어있는 곳2이 있습니다."
     });
   }
 
@@ -50,7 +50,7 @@ router.post("/auth/signup", async (req, res) => {
   });
 
   // 중복된 이메일 입력 확인
-  if (existEmail.length > 0) {
+  if (existEmail) {
     return res.status(409).send({
       success: false,
       errorMessage: "해당 이메일은 이미 사용 중입니다."
@@ -62,16 +62,13 @@ router.post("/auth/signup", async (req, res) => {
 
   // 회원가입 성공 시 정보 반환
   await Users.create({ email, username, password: hashedPassword });
-  res.status(201).json({
-    success: true,
-    message: "회원가입 되신 것을 축하드립니다!",
-    data: { email, username }
-  });
+
+  res.redirect("/login");
 });
 
 // 로그인 API
 // AccessToken만 다루고 후에 refreshToken까지 사용
-router.post("/auth/login", async (req, res) => {
+router.post("/user/signin", async (req, res) => {
   // 이메일, 비밀번호를 데이터로 넘겨받음
   const { email, password } = req.body;
 
@@ -106,17 +103,6 @@ router.post("/auth/login", async (req, res) => {
     // Token 유효기한 1시간 설정
     { expiresIn: "1h" }
   );
-  // Refresh token도 생성
-  const refreshToken = jwt.sign(
-    // userId를 담고 있는 Payload
-    { userId: user.userId },
-    refreshTokenSecretKey,
-    // Token 유효기한 1시간 설정
-    { expiresIn: "1d" }
-  );
-
-  // Refresh token을 DB에 저장
-  await Refresh_tokens.create({ token: refreshToken, userId: user.userId });
 
   // 생성한 Token 반환
   res.cookie("authorization", { accessToken: `Bearer ${accessToken}`, refreshToken: `Bearer ${refreshToken}` });
@@ -128,13 +114,13 @@ router.post("/auth/login", async (req, res) => {
 
 // 로그아웃 API
 router.get("/auth/logout", (req, res, next) => {
-    // Token을 초기화 한다.
-    res.clearCookie("authorization");
+  // Token을 초기화 한다.
+  res.clearCookie("authorization");
 
   return res.status(200).json({
     success: true,
     message: "로그아웃 되었습니다."
-    });
+  });
 });
 
 // router 모듈 내보내기
