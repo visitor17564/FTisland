@@ -1,6 +1,6 @@
 @port=http://localhost:3000
-@accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDcxOTg5MSwiZXhwIjoxNzAwNzIzNDkxfQ.xiN_hyPxj8GO3n5Ymam3oPywBae3M_g2_nygAZUPpIg
-@refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDcxOTg5MSwiZXhwIjoxNzAwODA2MjkxfQ.e4a_7ECOTdS3xw9zfthtI_kgyor8TwAZof7vA0RQyso
+@accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDczMzg3NywiZXhwIjoxNzAwNzM3NDc3fQ.YlRnf8dxPAa95tvL8wUPsWzyvKZrhroosF8I5mYaHjg
+@refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDczMzg3NywiZXhwIjoxNzAwODIwMjc3fQ.iEn5_-_GroXEs54f1Bq5JjJVmpsk8A9SQPq3vBAD0lY
 ### 회원가입
 POST {{port}}/api/auth/signup
 Content-Type: application/json
@@ -23,8 +23,20 @@ Content-Type: application/json
 
 ### 로그아웃
 GET http://localhost:3000/api/auth/logout
-
 Content-Type: application/json
+
+### 내 정보 생성
+POST {{port}}/api/user/me
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
+Content-Type: application/json
+
+{
+  "profile": "프로필테스트",
+  "region": "지역테스트",
+  "nation": "국가테스트",
+  "follow": "팔로우테스트"
+}
+
 ### 내 정보 조회
 GET {{port}}/api/user/me
 Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
@@ -36,48 +48,18 @@ Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 {
-  "profile": "프로필변경테스트",
-  "region": "지역변경테스트",
-  "nation": "국가변경테스트",
-  "follow": "팔로우변경테스트"
+  "profile": "프로필변경테스트3",
+  "region": "지역변경테스트3",
+  "nation": "국가변경테스트3",
+  "follow": "팔로우변경테스트3",
+  "confirmPassword": "test123"
 }
 
-### 상품등록
-POST http://localhost:3000/api/product
+### 내 정보 삭제
+DELETE {{port}}/api/user/me
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 {
-  "title": "대방어",
-  "content": "맛있겠죠?"
+  "confirmPassword": "test123"
 }
-
-### 상품등록
-POST http://localhost:3000/api/product
-Content-Type: application/json
-
-{
-  "title": "맛동산블랙",
-  "content": "갑자기먹고싶네"
-}
-
-### 상품목록조회
-GET http://localhost:3000/api/products
-Content-Type: application/json
-
-### 상품개별조회
-GET http://localhost:3000/api/product/2
-Content-Type: application/json
-
-### 상품수정
-PUT http://localhost:3000/api/product/2
-Content-Type: application/json
-
-{
-  "title": "훠궈2",
-  "content": "배부르죠?2",
-  "status": "SOLD_OUT"
-}
-
-### 상품삭제
-DELETE http://localhost:3000/api/product/2
-Content-Type: application/json
