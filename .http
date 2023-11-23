@@ -1,7 +1,9 @@
-@accessToken =Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDcwNjA0OSwiZXhwIjoxNzAwNzA5NjQ5fQ.3NG7K5BvOd8CRIaHDN46MGtxpqrKoXX16VVNj6xoGGA
+@port=http://localhost:3000
+@accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTcwMDY2NzU3OSwiZXhwIjoxNzAwNjcxMTc5fQ.-bcKSh4KaWQkFqDwyNdG8c2YpR7yRmJreEzEsPkmTyo
+@refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTcwMDY2NTI5NSwiZXhwIjoxNzAwNzUxNjk1fQ.Sbd2zpNqmK12upFIv39Na1lVXN36EpAh8PGW4sDUyCI
 
 ### 회원가입
-POST http://localhost:3000/api/auth/signup
+POST {{port}}/api/auth/signup
 Content-Type: application/json
 
 {
@@ -11,32 +13,12 @@ Content-Type: application/json
   "username": "관리자"
 }
 
-### 회원가입2
-POST http://localhost:3000/api/auth/signup
-Content-Type: application/json
-
-{
-  "email": "asdf@test.net",
-  "password": "test123",
-  "confirmPassword": "test123",
-  "username": "테스트"
-}
-
 ### 로그인
-POST http://localhost:3000/api/auth/login
+POST {{port}}/api/auth/login
 Content-Type: application/json
 
 {
   "email": "test@example.com",
-  "password": "test123"
-}
-
-### 로그인2
-POST http://localhost:3000/api/auth/login
-Content-Type: application/json
-
-{
-  "email": "asdf@test.net",
   "password": "test123"
 }
 
@@ -45,8 +27,8 @@ GET http://localhost:3000/api/auth/logout
 
 Content-Type: application/json
 ### 내 정보 조회
-GET http://localhost:3000/api/my_page
-Authorization: {{accessToken}}
+GET {{port}}/api/my_page
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 
@@ -67,7 +49,6 @@ Content-Type: application/json
   "title": "맛동산블랙",
   "content": "갑자기먹고싶네"
 }
-
 
 ### 상품목록조회
 GET http://localhost:3000/api/products
