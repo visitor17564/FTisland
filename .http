@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ### 로그인
-POST {{port}}/api/user/signin
+POST {{port}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -36,50 +36,44 @@ Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 {
-  "profile": "프로필변경테스트",
-  "region": "지역변경테스트",
-  "nation": "국가변경테스트",
-  "follow": "팔로우변경테스트"
+  "profile": "프로필변경테스트2",
+  "region": "지역변경테스트2",
+  "nation": "국가변경테스트2",
+  "follow": "팔로우변경테스트2"
 }
 
-### 상품등록
-POST http://localhost:3000/api/product
+### 여행지등록
+POST {{port}}/api/posts
 Content-Type: application/json
 
 {
-  "title": "대방어",
-  "content": "맛있겠죠?"
+  "title": "타이틀테스트",
+  "subtitle": "섭타이틀테스트",
+  "region": "서울",
+  "contents": "콘텐츠테스트"
 }
 
-### 상품등록
-POST http://localhost:3000/api/product
+### 여행지목록조회
+GET {{port}}/api/posts
+Content-Type: application/json
+
+### 여행지상세조회
+GET {{port}}/api/posts/2
+Content-Type: application/json
+
+### 관광지수정
+PUT {{port}}/api/posts/2
 Content-Type: application/json
 
 {
-  "title": "맛동산블랙",
-  "content": "갑자기먹고싶네"
-}
-
-### 상품목록조회
-GET http://localhost:3000/api/products
-Content-Type: application/json
-
-### 상품개별조회
-GET http://localhost:3000/api/product/2
-Content-Type: application/json
-
-### 상품수정
-PUT http://localhost:3000/api/product/2
-Content-Type: application/json
-
-{
-  "title": "훠궈2",
-  "content": "배부르죠?2",
-  "status": "SOLD_OUT"
+  "title": "타이틀테스트123412",
+  "subtitle": "섭타이틀테스트123413561",
+  "region": "서울12343",
+  "contents": "콘텐츠테스트12343"
 }
 
 ### 상품삭제
-DELETE http://localhost:3000/api/product/2
+DELETE {{port}}/api/posts/2
 Content-Type: application/json
 
 ### 내가 팔로우하는 사람

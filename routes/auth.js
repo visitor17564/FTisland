@@ -76,9 +76,7 @@ router.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
   // 해당 이메일을 가진 유저를 데이터베이스에서 찾는다.
-  const user = await Users.findOne({
-    where: { email }
-  });
+  const user = await Users.findOne({ where: { email } });
 
   // 유저 존재 유무 확인
   if (!user) {
