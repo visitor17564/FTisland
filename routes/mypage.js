@@ -80,11 +80,11 @@ router.get("/user/me", authMiddleware, async (req, res) => {
         include: [{ model: User_infos, attributes: ["profile", "region", "nation", "follow"] }],
     });
 
-    // 유저가 없는 경우
+    // 사용자가 없는 경우
     if (!user) {
       res.status(404).send({
         success: false,
-        errorMessage: "회원 조회에 실패하였습니다." 
+        errorMessage: "사용자 조회에 실패하였습니다." 
       })
     };
     
@@ -92,6 +92,7 @@ router.get("/user/me", authMiddleware, async (req, res) => {
     return res.status(200).json({
       success: true,
       data: user });
+      
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -149,55 +150,53 @@ router.put("/user/me", authMiddleware, async (req, res) => {
 });
 
 // 사용자 정보 삭제
-// router.delete("/user/me", authMiddleware, async (req, res) => {
-//   try {
-//     // 구조분해할당
-//      const { id } = res.locals.user;
-//      const { password } = req.body;
+router.delete("/user/me", authMiddleware, async (req, res) => {
+  try {
+    const { userId, password } = res.locals.user;
+    const { confirmPassword } = req.body;
 
-//      // 일단 상품 조회
-//      const user = await Users.findOne({
-//        where: {
-//          userId: userId
-//        }
-//      });
+    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
+    const user = await Users.findOne({
+      where: { userId : userId }
+    });
 
-//     // 유저가 없을 경우
-//     if (!user) {
-//       // userId로 뒤져서 나온 데이터가 false면 truthy되어 호출
-//       return res.status(404).json({
-//         success: false,
-//         errorMessage: "회원 조회에 실패하였습니다."
-//       });
-//     }
+    // 사용자가 없는 경우
+    if (!user) {
+      res.status(404).send({
+        success: false,
+        errorMessage: "이미 존재하지 않는 사용자 입니다." 
+      })
+    };
 
-//     // 로그인한 id값이 수정대상 상품 작성자와 다를 경우
-//     if (user.userId !== id) {
-//       return res.status(403).json({
-//         success: false,
-//         errorMessage: "권한이 없습니다."
-//       });
-//     }
+    // 비밀번호 비교
+    const hash = password;
+    const isValidPass = await comparePassword(confirmPassword, hash);
+    // 비밀번호가 서로 일치하지 않는 경우
+    if (!isValidPass) {
+    return res.status(401).json({
+      success: false,
+      errorMessage: "비밀번호가 서로 일치하지 않습니다."
+      });
+    }
 
-//     // 비밀번호가 일치하지 않을 때
-//     // 비밀번호 hash 및 비교
-//     const hash = user.password;
-//     const isValidPass = await comparePassword(password, hash);
-//     if (!isValidPass) {
-//       return res.status(401).json({ success: false, message: "비밀번호가 일치하지 않습니다." });
-//     }
+    // 사용자 및 사용자 정보 삭제
+    await Users.destroy({
+      where: { userId : userId }
+    })
 
-//     // 유효성 검사 통과시 상품삭제
-//     await Users.destroy({
-//       where: {
-//         userId: userId
-//       }
-//     });
-//     res.status(204).json({ success: true, message: "회원탈퇴가 완료되었습니다." });
-//   } catch (err) {
-//     res.status(500).json({ success: false, Message: "예기치 못한 오류가 발생하였습니다." });
-//     console.log(err);
-//   }
-// });
+    await User_infos.destroy({
+      where: { userId : userId }
+    })
+
+    res.status(204).json({
+      success: true,
+      message: "회원탈퇴가 완료되었습니다."
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, Message: "예기치 못한 오류가 발생하였습니다." });
+    console.log(err);
+  }
+});
 
 module.exports = router;
