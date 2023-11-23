@@ -38,7 +38,6 @@ module.exports = async (req, res, next) => {
   const accessTokenUserId = await verifiedAccessToken.then((res) => {
     return res.userId;
   });
-  console.log("엑세스토큰 UserId : " + accessTokenUserId);
 
   // RefreshToken을 검증하는 함수를 선언해둠
   const verifyRefreshToken = async function (refreshAuthToken) {
@@ -54,11 +53,13 @@ module.exports = async (req, res, next) => {
     return res.userId;
   });
 
+  // RefreshToken은 DB에서도 뒤져둬야함
+  const findDbRefreshToken = await Refresh_tokens.findOne({ where: { token: refreshAuthToken } });
   // AccessToken이 검증에 통과할 경우 RefreshToken이 있는지 확인
   // verifiedRefreshToken가 프로미스라 그냥 조건문에 넣으면 인증실패해도 falsy안됨
   if (accessTokenUserId) {
     // RefreshToken이 없을 경우 token을 생성, DB저장하고 DATA반환
-    if (!refreshTokenUserId) {
+    if (!refreshTokenUserId || !findDbRefreshToken) {
       const recreatedRefreshToken = jwt.sign(
         // 엑세스토큰 userId를 담고 있는 Payload
         { userId: accessTokenUserId },
@@ -74,6 +75,8 @@ module.exports = async (req, res, next) => {
         accessToken: `Bearer ${accessAuthToken}`,
         refreshToken: `Bearer ${recreatedRefreshToken}`
       });
+      console.log("액세스토큰이 유지됨" + accessAuthToken);
+      console.log("리프레시토큰이 재발행됨" + recreatedRefreshToken);
       next();
       return;
       // RefreshToken이 있을 경우 DATA반환
@@ -86,10 +89,7 @@ module.exports = async (req, res, next) => {
   }
 
   // AccessToken이 검증에 실패할 경우 RefreshToken이 있는지 확인
-  // 일단 DB에서 RefreshToken을 조회
-  const Refresh_tokens = await Refresh_tokens.findOne({ where: { token: refreshAuthToken } });
-
-  if (Refresh_tokens) {
+  if (findDbRefreshToken) {
     // RefreshToken이 있을 경우 AccessToken을 생성, 데이터 반환
     const recreatedAccessToken = jwt.sign({ userId: refreshTokenUserId }, accessTokenSecretKey, { expiresIn: "1h" });
     const user = await Users.findOne({ where: { userId: refreshTokenUserId } });
@@ -99,6 +99,8 @@ module.exports = async (req, res, next) => {
       accessToken: `Bearer ${recreatedAccessToken}`,
       refreshToken: `Bearer ${refreshAuthToken}`
     });
+    console.log("액세스토큰이 재발행됨" + recreatedAccessToken);
+    console.log("리프레시토큰이 유지됨" + refreshAuthToken);
     return;
     next();
   } else {
