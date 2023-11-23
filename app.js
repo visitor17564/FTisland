@@ -5,6 +5,7 @@ const postsRouter = require("./routes/posts.js");
 const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
 const mainRouter = require("./routes/main.router.js");
+const followRouter = require("./routes/follows.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const path = require("path");
@@ -22,7 +23,7 @@ const publicDirectoryPath = path.join(__dirname, "public");
 app.use(express.static(publicDirectoryPath));
 const temp = ["서울", "경기", "인천", "강원"];
 // router middleware
-app.use("/api", [authRouter, mypageRouter, postsRouter]);
+app.use("/api", [authRouter, mypageRouter, postsRouter, followRouter]);
 app.use("/", [mainRouter]);
 
 // app.use((err, req, res, next) => {
