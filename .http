@@ -1,57 +1,54 @@
+@accessToken =Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDcwNjA0OSwiZXhwIjoxNzAwNzA5NjQ5fQ.3NG7K5BvOd8CRIaHDN46MGtxpqrKoXX16VVNj6xoGGA
+
 ### 회원가입
-POST http://localhost:3000/auth/signup
+POST http://localhost:3000/api/auth/signup
 Content-Type: application/json
 
 {
-  "email": "example@example.com",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "관리자"
+  "email": "test@example.com",
+  "password": "test123",
+  "confirmPassword": "test123",
+  "username": "관리자"
 }
 
 ### 회원가입2
-POST http://localhost:3000/auth/signup
+POST http://localhost:3000/api/auth/signup
 Content-Type: application/json
 
 {
-  "email": "asdfgh@hanmail.net",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "해시"
-}
-
-### 회원가입3
-POST http://localhost:3000/auth/signup
-Content-Type: application/json
-
-{
-  "email": "visitor6@hanmail.net",
-  "password": "102938",
-  "passwordConfirm": "102938",
-  "name": "사용자정보내놔6"
+  "email": "asdf@test.net",
+  "password": "test123",
+  "confirmPassword": "test123",
+  "username": "테스트"
 }
 
 ### 로그인
-POST http://localhost:3000/auth/login
+POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "example@example.com",
-  "password": "102938"
+  "email": "test@example.com",
+  "password": "test123"
 }
 
 ### 로그인2
-POST http://localhost:3000/auth/login
+POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "asdfg",
-  "password": "102938"
+  "email": "asdf@test.net",
+  "password": "test123"
 }
 
-### 내 정보 조회
-GET http://localhost:3000/auth/my_page
+### 로그아웃
+GET http://localhost:3000/api/auth/logout
+
 Content-Type: application/json
+### 내 정보 조회
+GET http://localhost:3000/api/my_page
+Authorization: {{accessToken}}
+Content-Type: application/json
+
 
 ### 상품등록
 POST http://localhost:3000/api/product
