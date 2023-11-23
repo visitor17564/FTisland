@@ -1,11 +1,11 @@
-// express모듈 가져오기
+// 모듈 가져오기
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 // express모듈에서 router 가져오기
 const router = express.Router();
-// jwt모듈 가져오기
-const jwt = require("jsonwebtoken");
-// bcrypt모듈 가져오기, 비밀번호 암호화(hash)
-const bcrypt = require("bcrypt");
+
 // users 모델 가져오기
 const { Users } = require("../models");
 // accessToken_Secret_key
@@ -13,7 +13,7 @@ require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 
 // 회원가입 API
-router.post("/user/signup", async (req, res) => {
+router.post("/auth/signup", async (req, res) => {
     // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
     const { email, username, password, confirmPassword } = req.body;
 
@@ -70,7 +70,7 @@ router.post("/user/signup", async (req, res) => {
 
 // 로그인 API
 // AccessToken만 다루고 후에 refreshToken까지 사용
-router.post("/user/login", async (req, res) => {
+router.post("/auth/login", async (req, res) => {
     // 이메일, 비밀번호를 데이터로 넘겨받음
     const { email, password } = req.body;
   
@@ -105,6 +105,9 @@ router.post("/user/login", async (req, res) => {
         // Token 유효기한 1시간 설정
         { expiresIn: "1h" }
     );
+
+    // 쿠키에 accessToken 저장
+    res.cookie("accessToken", accessToken);
    
     // 생성한 Token 반환
     return res.status(200).json({
@@ -112,8 +115,21 @@ router.post("/user/login", async (req, res) => {
         message: "로그인 되었습니다.",
         data: { token: `Bearer ${accessToken}` }
     });
-
 });
+
+// 로그아웃 API
+router.get("/auth/logout", (req, res, next) => {
+    // accessToken을 초기화 한다.
+    res.clearCookie('accessToken');
+    
+    // 클라이언트를 로그인 경로로 리다이렉트 한다.
+    res.redirect("/auth/login");
+
+    return res.status(200).json({
+        success: true,
+        message: "로그아웃 되었습니다."
+    })
+})
 
 // router 모듈 내보내기
 module.exports = router;
