@@ -96,13 +96,26 @@ const authMiddleware = async (req, res, next) => {
     });
   }
 };
-
+// 로그인 상태 확인 검증값으로 바꿔야됨
 const checkAuth = (req, res, next) => {
-  const user = res.locals.user;
-  if (!user) {
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+  console.log(accessToken);
+  if (accessToken && refreshToken) {
+    next();
+  } else {
     res.redirect("/login");
   }
-  next();
+};
+//임시용 쿠키값 있는지 확인
+const checkCookies = (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+  if (accessToken && refreshToken) {
+    next();
+  } else {
+    res.redirect("/login");
+  }
 };
 
 module.exports = {
