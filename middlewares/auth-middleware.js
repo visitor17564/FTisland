@@ -97,8 +97,15 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-const checkAuth = (req, res) => {};
+const checkAuth = (req, res) => {
+  const user = res.locals.user;
+  if (!user) {
+    res.redirect("/login");
+  }
+  next();
+};
 
 module.exports = {
-  authMiddleware
+  authMiddleware,
+  checkAuth
 };

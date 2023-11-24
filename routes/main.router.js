@@ -3,12 +3,14 @@ const mainRouter = express.Router();
 const { Posts, user } = require("../models");
 const temp = ["서울", "경기", "인천", "강원"];
 
+const { checkAuth } = require("../middlewares/auth-middleware");
+
 mainRouter.get("/", (req, res) => {
   res.redirect("/posts");
 });
 
 // get all posts
-mainRouter.get("/posts", async (req, res) => {
+mainRouter.get("/posts", checkAuth, async (req, res) => {
   const post = await Posts.findAll({});
   const user = {
     userId: 1,
