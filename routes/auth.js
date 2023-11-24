@@ -119,7 +119,7 @@ router.post("/auth/login", async (req, res) => {
   await Refresh_tokens.create({ token: refreshToken, userId: user.userId });
 
   // 생성한 Token 반환
-  res.cookie("authorization", accessToken);
+  res.cookie("accessToken", accessToken);
   res.cookie("refreshToken", refreshToken);
   res.redirect("/posts");
 });
