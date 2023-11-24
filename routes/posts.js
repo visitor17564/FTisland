@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Posts, Users, Comment } = require("../models");
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const { authMiddleware } = require("../middlewares/auth-middleware.js");
 // const Comment = require("../models/comments");
 const Post = require("../models/posts");
 
