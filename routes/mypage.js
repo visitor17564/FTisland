@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/user/me", [
   // 빈 입력란 여부 체크 및 앞뒤 공백 제거
   body("profile").notEmpty().trim().withMessage("프로필이 비어있습니다."),
-  body("regoin").notEmpty.trim().withMessage("지역이 비어있습니다."),
+  body("region").notEmpty.trim().withMessage("지역이 비어있습니다."),
   body("nation").notEmpty.trim().withMessage("국가가 비어있습니다."),
   body("follow").notEmpty.trim().errorMessage("팔로우가 비어있습니다.")
 
