@@ -60,7 +60,6 @@ router.post("/auth/signup", async (req, res) => {
       errorMessage: "해당 이메일은 이미 사용 중입니다."
     });
   }
-
   // 비밀번호 hash
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -72,10 +71,15 @@ router.post("/auth/signup", async (req, res) => {
 
 // 로그인 API
 router.post("/auth/login", async (req, res) => {
+  console.log(req.body);
   const { email, password } = req.body;
+
+  // 해당 이메일을 가진 유저를 데이터베이스에서 찾는다.
   const user = await Users.findOne({
     where: { email }
   });
+
+  // 유저 존재 유무 확인
   if (!user) {
     return res.status(401).send({
       success: false,

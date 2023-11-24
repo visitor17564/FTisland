@@ -126,30 +126,3 @@ Content-Type: application/json
 {
   "targetId" : 2
 }
-
-### 할배네 상품 등록
-POST http://localhost:3000/api/posts
-Content-Type: application/json
-
-{
-  "title": "할부지2",
-  "subtitle": "경로당2",
-  "region": "파푸니카2",
-  "contents": "라일라이2"
-}
-
-### 할배네 상품 수정
-PUT http://localhost:3000/api/posts/5
-Content-Type: application/json
-
-{
-  "title": "할부지5",
-  "subtitle": "경로당5",
-  "region": "파푸니카5",
-  "contents": "라일라이5"
-}
-
-### 할배네 상품 삭제
-DELETE http://localhost:3000/api/posts/5
-Content-Type: application/json
-
