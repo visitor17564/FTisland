@@ -1,7 +1,7 @@
 @port=http://localhost:3000
 @accessToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDczMzg3NywiZXhwIjoxNzAwNzM3NDc3fQ.YlRnf8dxPAa95tvL8wUPsWzyvKZrhroosF8I5mYaHjg
 @refreshToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTcwMDczMzg3NywiZXhwIjoxNzAwODIwMjc3fQ.iEn5_-_GroXEs54f1Bq5JjJVmpsk8A9SQPq3vBAD0lY
-### 회원가입
+###회원가입
 POST {{port}}/api/auth/signup
 Content-Type: application/json
 
@@ -12,7 +12,7 @@ Content-Type: application/json
   "username": "관리자"
 }
 
-### 로그인
+###로그인
 POST {{port}}/api/auth/login
 Content-Type: application/json
 
@@ -21,11 +21,11 @@ Content-Type: application/json
   "password": "test123"
 }
 
-### 로그아웃
+###로그아웃
 GET http://localhost:3000/api/auth/logout
 Content-Type: application/json
 
-### 내 정보 생성
+###내 정보 생성
 POST {{port}}/api/user/me
 Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
@@ -37,24 +37,34 @@ Content-Type: application/json
   "follow": "팔로우테스트"
 }
 
-### 내 정보 조회
+###내 정보 조회
 GET {{port}}/api/user/me
 Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
-### 내 정보 수정
+###내 정보 수정
 PUT {{port}}/api/user/me
 Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 {
-  "profile": "프로필변경테스트",
-  "region": "지역변경테스트",
-  "nation": "국가변경테스트",
-  "follow": "팔로우변경테스트"
+  "profile": "프로필변경테스트2",
+  "region": "지역변경테스트2",
+  "nation": "국가변경테스트2",
+  "follow": "팔로우변경테스트2",
+  "confirmPassword": "test123"
 }
 
-### 상품등록
+###내 정보 삭제
+DELETE {{port}}/api/user/me
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
+Content-Type: application/json
+
+{
+  "confirmPassword" : "test123"
+}
+
+###상품등록
 POST http://localhost:3000/api/product
 Content-Type: application/json
 
@@ -63,7 +73,7 @@ Content-Type: application/json
   "content": "맛있겠죠?"
 }
 
-### 상품등록
+###상품등록
 POST http://localhost:3000/api/product
 Content-Type: application/json
 
@@ -72,53 +82,10 @@ Content-Type: application/json
   "content": "갑자기먹고싶네"
 }
 
-### 상품목록조회
+###상품목록조회
 GET http://localhost:3000/api/products
 Content-Type: application/json
 
-### 상품개별조회
+###상품개별조회
 GET http://localhost:3000/api/product/2
 Content-Type: application/json
-
-### 상품수정
-PUT http://localhost:3000/api/product/2
-Content-Type: application/json
-
-{
-  "title": "훠궈2",
-  "content": "배부르죠?2",
-  "status": "SOLD_OUT"
-}
-
-### 내가 팔로우하는 사람
-GET {{port}}/api/user/my_follows
-Content-Type: application/json
-
-### 나를 팔로우하는 사람
-GET {{port}}/api/user/my_followers
-Content-Type: application/json
-
-### 로그인2
-POST {{port}}/api/auth/login
-Content-Type: application/json
-
-{
-  "email": "visitor@example.com",
-  "password": "102938"
-}
-
-### follow버튼 누르기
-POST {{port}}/api/user/my_follows
-Content-Type: application/json
-
-{
-  "targetId" : 2
-}
-
-### follow취소 누르기
-DELETE {{port}}/api/user/my_follows
-Content-Type: application/json
-
-{
-  "targetId" : 2
-}
