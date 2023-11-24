@@ -10,7 +10,7 @@ const { Users } = require("../models");
 const { User_infos } = require("../models");
 
 // 미들웨어 가져오기
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const { authMiddleware } = require("../middlewares/auth-middleware");
 
 // 비밀번호 비교 함수
 const comparePassword = async (password, hash) => {

@@ -8,7 +8,7 @@ const router = express.Router();
 const { Posts, Likes } = require("../models/index.js");
 
 // 미들웨어 가져오기
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const { authMiddleware } = require("../middlewares/auth-middleware");
 
 // 게시글
 const target_type = 2;
