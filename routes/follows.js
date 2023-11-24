@@ -8,7 +8,7 @@ const router = express.Router();
 const { Users, Follows } = require("../models");
 
 // 미들웨어 가져오기
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const { authMiddleware } = require("../middlewares/auth-middleware");
 
 // 내가 팔로우하는 사람 조회API
 router.get("/user/my_follows", authMiddleware, async (req, res) => {
