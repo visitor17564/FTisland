@@ -15,6 +15,7 @@ router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
     });
   }
   const userId = req.user.userId;
+  console.log(userId);
   const post = new Posts({
     userId,
     title,

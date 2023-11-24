@@ -118,14 +118,12 @@ router.get("/auth/logout", (req, res, next) => {
 router.get("/auth/refresh", async (req, res, next) => {
   console.log("refresh");
   const refreshToken = req.cookies.refreshToken;
-
   const getRedis = await redis.get(refreshToken);
   if (!getRedis) {
     next(new Error("NotFoundRefreshTokenInDB"));
   }
 
   const accessToken = jwt.sign({ userId: getRedis }, accessTokenSecretKey, { expiresIn: "30m" });
-
   res.clearCookie("accessToken");
   res.cookie("accessToken", accessToken);
   res.redirect("back");

@@ -14,3 +14,7 @@
   background-color: transparent;
   border-width: 0px;
 }
+
+.region:active {
+  padding: auto;
+}

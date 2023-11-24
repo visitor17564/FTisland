@@ -66,6 +66,7 @@ mainRouter.get("/user/:id", authMiddleware, async (req, res, next) => {
     const userId = user.userId;
     const { profile, region, nation, follow } = req.body;
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
+
     const user_info = await User_infos.findOne({
       where: { userId: userId }
     });

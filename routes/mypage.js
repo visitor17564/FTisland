@@ -68,7 +68,7 @@ router.post("/user/me", authMiddleware, async (req, res) => {
 // 사용자 정보 조회 API
 router.get("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.locals.user;
+    const { userId } = req.user;
 
     // user와 user_info의 id가 일치하는 것을 찾는다.
     const user = await Users.findOne({
