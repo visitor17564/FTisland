@@ -69,7 +69,6 @@ router.post("/auth/signup", [
       errorMessage: "해당 이메일은 이미 사용 중입니다."
     });
   }
-
   // 비밀번호 hash
   const hashedPassword = await bcrypt.hash(password, 10);
 

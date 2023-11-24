@@ -63,7 +63,7 @@ router.post("/user/me", [
 // 사용자 정보 조회 API
 router.get("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.user;
+    const { userId } = req.user;
 
     // user와 user_info의 id가 일치하는 것을 찾는다.
     const user = await Users.findOne({
@@ -107,7 +107,7 @@ router.put("/user/me", [
 
 ], validatorErrorCheck, authMiddleware, async (req, res) => {
   try {
-    const { userId, password } = res.user;
+    const { userId, password } = req.user;
     const { profile, region, nation, follow, confirmPassword } = req.body;
 
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
@@ -153,7 +153,7 @@ router.put("/user/me", [
 // 사용자 정보 삭제
 router.delete("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId, password } = res.user;
+    const { userId, password } = req.user;
     const { confirmPassword } = req.body;
 
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.

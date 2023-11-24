@@ -15,7 +15,7 @@ const target_type = 2;
 
 // 내가 좋아하는 게시글 조회API(수정필요)
 router.get("/user/my_liked_posts", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   // user와 user_info의 id가 일치하는 것을 찾는다.
   const myLikedTargetId = await Likes.findAll({
     attributes: [],
@@ -62,7 +62,7 @@ router.get("/posts/likes/:postId", async (req, res) => {
 // Like버튼 누르기
 router.post("/posts/likes", authMiddleware, async (req, res) => {
   // 구조분해할당
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   const { targetId } = req.body;
 
   const checkLikes = await Likes.findAll({
@@ -84,7 +84,7 @@ router.post("/posts/likes", authMiddleware, async (req, res) => {
 // Likes 취소버튼 누르기
 router.delete("/posts/likes", authMiddleware, async (req, res) => {
   // 구조분해할당
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   const { targetId } = req.body;
 
   // 인증미들웨어만 통과하면 follow 등록
