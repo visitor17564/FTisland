@@ -97,7 +97,7 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-const checkAuth = (req, res) => {
+const checkAuth = (req, res, next) => {
   const user = res.locals.user;
   if (!user) {
     res.redirect("/login");
