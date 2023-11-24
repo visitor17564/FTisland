@@ -43,6 +43,7 @@ router.post("/user/me", [
     // 사용자 정보가 존재하지 않으면 새로운 사용자 정보를 생성한다.
     if (!user_info) {
       await User_infos.create({
+        userId: userId,
         profile: profile,
         region: region,
         nation: nation,
