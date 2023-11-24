@@ -1,29 +1,24 @@
-// 모듈 가져오기
+// import
 const express = require("express");
 const bcrypt = require("bcrypt");
-
-// router 가져오기
-const router = express.Router();
-
-// 모델 가져오기
 const { Users } = require("../models");
 const { User_infos } = require("../models");
-
-// 미들웨어 가져오기
+const { body } = require("express-validator");
+const { validatorErrorCheck } = require("../middlewares/validatorErrorCheck-middleware");
 const { authMiddleware } = require("../middlewares/auth-middleware");
 
-// 비밀번호 비교 함수
-// const comparePassword = async (password, hash) => {
-//   try {
-//     return await bcrypt.compare(password, hash);
-//   } catch (error) {
-//     console.log(error);
-//   }
-//   return false;
-// };
+// mypage.js - global variables
+const router = express.Router();
 
 // 사용자 정보 생성 API
-router.post("/user/me", authMiddleware, async (req, res) => {
+router.post("/user/me", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("profile").notEmpty().trim().withMessage("프로필이 비어있습니다."),
+  body("regoin").notEmpty.trim().withMessage("지역이 비어있습니다."),
+  body("nation").notEmpty.trim().withMessage("국가가 비어있습니다."),
+  body("follow").notEmpty.trim().errorMessage("팔로우가 비어있습니다.")
+
+], validatorErrorCheck, authMiddleware, async (req, res) => {
   try {
     const { userId } = res.user;
     const { profile, region, nation, follow } = req.body;
@@ -68,7 +63,7 @@ router.post("/user/me", authMiddleware, async (req, res) => {
 // 사용자 정보 조회 API
 router.get("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.locals.user;
+    const { userId } = res.user;
 
     // user와 user_info의 id가 일치하는 것을 찾는다.
     const user = await Users.findOne({
@@ -102,9 +97,17 @@ router.get("/user/me", authMiddleware, async (req, res) => {
 });
 
 // 사용자 정보 수정 API
-router.put("/user/me", authMiddleware, async (req, res) => {
+router.put("/user/me", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("profile").notEmpty.trim().withMessage("프로필이 비어있습니다."),
+  body("region").notEmpty.trim().withMessage("지역이 비어있습니다."),
+  body("nation").notEmpty.trim().withMessage("국가가 비어있습니다."),
+  body("follow").notEmpty.trim().withMessage("팔로우가 비어있습니다."),
+  body("confirmPassword").notEmpty.trim().withMessage("확인용 비밀번호가 비어있습니다.")
+
+], validatorErrorCheck, authMiddleware, async (req, res) => {
   try {
-    const { userId, password } = res.locals.user;
+    const { userId, password } = res.user;
     const { profile, region, nation, follow, confirmPassword } = req.body;
 
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
@@ -150,7 +153,7 @@ router.put("/user/me", authMiddleware, async (req, res) => {
 // 사용자 정보 삭제
 router.delete("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId, password } = res.locals.user;
+    const { userId, password } = res.user;
     const { confirmPassword } = req.body;
 
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
