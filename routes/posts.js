@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { Posts, Users, Comment } = require("../models");
+const authMiddleware = require("../middlewares/auth-middleware.js");
 // const Comment = require("../models/comments");
 const Post = require("../models/posts");
 
 //여행지 등록
-router.post("/posts", async (req, res) => {
+router.post("/posts", authMiddleware, async (req, res) => {
+  const { userId } = res.locals.user;
   try {
     const { title, subtitle, region, contents } = req.body;
     if (!title || !subtitle || !region || !contents) {
@@ -15,7 +17,7 @@ router.post("/posts", async (req, res) => {
       });
     }
     const post = new Posts({
-      userId: 1,
+      userId,
       title,
       subtitle,
       region,
@@ -36,7 +38,9 @@ router.post("/posts", async (req, res) => {
 });
 
 //관광지 수정
-router.put("/posts/:postId", async (req, res) => {
+router.put("/posts/:postId", authMiddleware, async (req, res) => {
+  let { userId } = res.locals.user;
+  const userId2 = userId;
   try {
     const postId = req.params.postId;
     const { title, subtitle, region, contents } = req.body;
@@ -46,9 +50,12 @@ router.put("/posts/:postId", async (req, res) => {
         message: "데이터형식이 올바르지 않습니다."
       });
     }
-    const post = await Posts.findOne({ postId });
-
-    if (!post.dataValues) {
+    const post = await Posts.findOne({
+      where: { postId }
+    });
+    const { userId } = post;
+    console.log("그래맞아" + userId);
+    if (userId2 !== userId) {
       return res.status(401).json({
         success: false,
         message: "관광지 정보를 수정할 권한이 존재하지 않습니다."
@@ -56,26 +63,25 @@ router.put("/posts/:postId", async (req, res) => {
     }
     const updatedAt = new Date();
 
-    post
-      .update(
-        {
-          title,
-          subtitle,
-          region,
-          contents,
-          updatedAt
-        },
-        {
-          where: { postId }
-        }
-      )
-      .then(() => {
-        return res.status(200).json({
-          success: true,
-          message: "관광지 정보를 수정하였습니다."
-        });
+    Posts.update(
+      {
+        title,
+        subtitle,
+        region,
+        contents,
+        updatedAt
+      },
+      {
+        where: { postId }
+      }
+    ).then(() => {
+      return res.status(200).json({
+        success: true,
+        message: "관광지 정보를 수정하였습니다."
       });
+    });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       success: false,
       message: "서버 오류."
@@ -84,33 +90,32 @@ router.put("/posts/:postId", async (req, res) => {
 });
 
 //관광지 삭제
-router.delete("/posts/:postId", async (req, res) => {
+router.delete("/posts/:postId", authMiddleware, async (req, res) => {
   try {
     const postId = req.params.postId;
-    const post = await Posts.findOne({ postId });
-
-    if (!post.dataValues) {
+    const post = await Posts.findAll({
+      where: { postId }
+    });
+    if (!post) {
       return res.status(500).json({
         success: false,
         message: "관광지 조회에 실패 하였습니다."
       });
     }
-    // if (post.dataValues.postId !== res.locals.posts.dataValues.postId) {
-    //     return res.status(401).json({
-    //         success: false,
-    //         message: "관광지를 삭제할 권한이 존재하지 않습니다."
-    //     });
-    // }
-    post
-      .destroy({
-        where: { postId }
-      })
-      .then(() => {
-        return res.status(200).json({
-          success: false,
-          message: "관광지 정보를 삭제하였습니다."
-        });
+    if (post.dataValues.postId !== res.locals.posts.dataValues.postId) {
+      return res.status(401).json({
+        success: false,
+        message: "관광지를 삭제할 권한이 존재하지 않습니다."
       });
+    }
+    Posts.destroy({
+      where: { postId }
+    }).then(() => {
+      return res.status(200).json({
+        success: false,
+        message: "관광지 정보를 삭제하였습니다."
+      });
+    });
   } catch (err) {
     return res.status(400).json({
       success: false,

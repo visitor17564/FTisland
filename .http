@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ### 로그인
-POST {{port}}/api/user/signin
+POST {{port}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -113,4 +113,26 @@ Content-Type: application/json
 
 {
   "targetId" : 2
+}
+
+### 할배네 상품 등록
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+  "title": "할부지2",
+  "subtitle": "경로당2",
+  "region": "파푸니카2",
+  "contents": "라일라이2"
+}
+
+### 할배네 상품 수정
+PUT http://localhost:3000/api/posts/5
+Content-Type: application/json
+
+{
+  "title": "할부지5",
+  "subtitle": "경로당5",
+  "region": "파푸니카5",
+  "contents": "라일라이5"
 }
