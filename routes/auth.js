@@ -70,7 +70,6 @@ router.post("/auth/signup", async (req, res) => {
 });
 
 // 로그인 API
-// AccessToken만 다루고 후에 refreshToken까지 사용
 router.post("/auth/login", async (req, res) => {
   // 이메일, 비밀번호를 데이터로 넘겨받음
   const { email, password } = req.body;
@@ -109,7 +108,7 @@ router.post("/auth/login", async (req, res) => {
     // userId를 담고 있는 Payload
     { userId: user.userId },
     refreshTokenSecretKey,
-    // Token 유효기한 1시간 설정
+    // Token 유효기한 1일 설정
     { expiresIn: "1d" }
   );
 
@@ -117,7 +116,7 @@ router.post("/auth/login", async (req, res) => {
   await Refresh_tokens.create({ token: refreshToken, userId: user.userId });
 
   // 생성한 Token 반환
-  res.cookie("authorization", accessToken);
+  res.cookie("accessToken", accessToken);
   res.cookie("refreshToken", refreshToken);
   res.redirect("/posts");
 });

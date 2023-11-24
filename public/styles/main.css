@@ -10,3 +10,7 @@
   border-radius: 4px;
   background-color: #f5f5f5;
 }
+.no-outline {
+  background-color: transparent;
+  border-width: 0px;
+}
