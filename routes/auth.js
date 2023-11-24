@@ -2,45 +2,55 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { body, validationResult } = require("express-validator");
+const { body } = require("express-validator");
 
 // express모듈에서 router 가져오기
 const router = express.Router();
 
 // users 모델 가져오기
 const { Users, Refresh_tokens } = require("../models");
+
+// validatorErrorCheck 미들웨어 가져오기
+const { validatorErrorCheck } = require("../middlewares/validatorErrorCheck-middleware");
+
 // accessToken_Secret_key
 require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
+// 비밀번호 비교 함수
+const comparePassword = async (password, hash) => {
+  try {
+    return await bcrypt.compare(password, hash);
+  } catch (error) {
+    console.log(error);
+  }
+  return false;
+};
+
 // 회원가입 API
 router.post("/auth/signup", [
-  // 빈 입력란 여부 체크
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("email").notEmpty().trim().withMessage("이메일이 비어있습니다."),
+  body("username").notEmpty().trim().withMessage("이름이 비어있습니다."),
+  body("password").notEmpty().trim().withMessage("비밀번호가 비어있습니다."),
+  body("confirmPassword").notEmpty().trim().withMessage("확인용 비밀번호가 비어있습니다."),
 
   // 이메일 형식 체크
-  body("email").isEmail().withMessage("올바른 이메일 형식이 아닙니다.")
-],
+  body("email").isEmail().isLength({max:30}).withMessage("올바른 이메일 형식이 아닙니다."),
   
-  async (req, res) => {
+  // 비밀번호 6자 이상, 일치 여부 확인
+  body("password").isLength({min:6}).withMessage("비밀번호는 최소 6자 이상입니다."),
+  body("confirmPassword").custom((confirmPassword, {req}) => {
+    if(confirmPassword !== req.body.password) {
+      return false;
+    }
+    return true;
+  }).withMessage("비밀번호가 서로 일치하지 않습니다.")
+
+], validatorErrorCheck, async (req, res) => {
   // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
-  const { email, username, password, confirmPassword } = req.body;
-
-  // 빈 입력란 여부 체크
-  if (!email || !username || !password || !confirmPassword) {
-    return res.status(401).send({
-      success: false,
-      errorMessage: "입력란 중 비어있는 곳이 있습니다."
-    });
-  }
-
-  // 비밀번호 최소 6자 이상, 비밀번호 일치 여부 확인
-  if (password.length < 6 || password !== confirmPassword) {
-    return res.status(401).send({
-      success: false,
-      errorMessage: "비밀번호가 최소 6자 이상이어야 하며, 서로 일치해야 합니다."
-    });
-  }
+  const { email, username, password } = req.body;
 
   // 이메일이 중복되는지 확인하기 위해 가져온다.
   const existEmail = await Users.findAll({
@@ -68,9 +78,18 @@ router.post("/auth/signup", [
 });
 
 // 로그인 API
-router.post("/auth/login", async (req, res) => {
+router.post("/auth/login", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("email").notEmpty().trim().withMessage("이메일이 비어있습니다."),
+  body("password").notEmpty().trim().withMessage("비밀번호가 비어있습니다."),
+
+  // 이메일 형식 체크
+  body("email").isEmail().isLength({max:30}).withMessage("올바른 이메일 형식이 아닙니다.")
+
+], validatorErrorCheck, async (req, res) => {
+  const { password } = res.locals.user;
   // 이메일, 비밀번호를 데이터로 넘겨받음
-  const { email, password } = req.body;
+  const { email, confirmPassword } = req.body;
 
   // 해당 이메일을 가진 유저를 데이터베이스에서 찾는다.
   const user = await Users.findOne({
@@ -86,9 +105,10 @@ router.post("/auth/login", async (req, res) => {
   }
 
   // 비밀번호 서로 일치여부 확인
-  const matchPassword = await bcrypt.compare(password, user.password);
+  const hash = password;
+  const isValidPass = await comparePassword(confirmPassword, hash);
 
-  if (!matchPassword) {
+  if (!isValidPass) {
     return res.status(401).send({
       success: false,
       errorMessage: "비밀번호가 일치하지 않습니다."
