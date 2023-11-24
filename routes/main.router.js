@@ -63,7 +63,9 @@ mainRouter.get("/posts/:postId", async (req, res) => {
 });
 
 mainRouter.get("/signup", (req, res) => {
-  res.render("auth/signup");
+  res.render("auth/signup", {
+    User: null
+  });
 });
 
 mainRouter.get("/login", (req, res) => {
