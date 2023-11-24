@@ -31,9 +31,9 @@ const temp = ["서울", "경기", "인천", "강원"];
 app.use("/api", [authRouter, mypageRouter, postsRouter, followRouter]);
 app.use("/", mainRouter);
 
-// app.use((err, req, res, next) => {
-//   errorHandler(err.message, req, res);
-// });
+app.use((err, req, res, next) => {
+  errorHandler(err.message, req, res);
+});
 
 app.listen(port, () => {
   console.log(port, " 서버가 열렸습니다. " + port);
