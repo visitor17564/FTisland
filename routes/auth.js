@@ -1,32 +1,16 @@
-// 모듈 가져오기
+// import
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { body } = require("express-validator");
-
-// express모듈에서 router 가져오기
-const router = express.Router();
-
-// users 모델 가져오기
-const { Users, Refresh_tokens } = require("../models");
-
-// validatorErrorCheck 미들웨어 가져오기
+const { Users } = require("../models");
+const { redis } = require("../config/config");
 const { validatorErrorCheck } = require("../middlewares/validatorErrorCheck-middleware");
-
-// accessToken_Secret_key
 require("dotenv").config();
+
+// auth.js - global variables
+const router = express.Router();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
-
-// 비밀번호 비교 함수
-const comparePassword = async (password, hash) => {
-  try {
-    return await bcrypt.compare(password, hash);
-  } catch (error) {
-    console.log(error);
-  }
-  return false;
-};
 
 // 회원가입 API
 router.post("/auth/signup", [
@@ -70,11 +54,8 @@ router.post("/auth/signup", [
 
   // 회원가입 성공 시 정보 반환
   await Users.create({ email, username, password: hashedPassword });
-  res.status(201).json({
-    success: true,
-    message: "회원가입 되신 것을 축하드립니다!",
-    data: { email, username }
-  });
+
+  res.redirect("/login");
 });
 
 // 로그인 API
@@ -95,8 +76,6 @@ router.post("/auth/login", [
   const user = await Users.findOne({
     where: { email }
   });
-
-  // 유저 존재 유무 확인
   if (!user) {
     return res.status(401).send({
       success: false,
@@ -114,28 +93,17 @@ router.post("/auth/login", [
       errorMessage: "비밀번호가 일치하지 않습니다."
     });
   }
+  const accessToken = jwt.sign({ userId: user.userId }, accessTokenSecretKey, { expiresIn: "1h" });
 
-  // 로그인 성공 시 JWT AccessToken을 생성
-  const accessToken = jwt.sign(
-    // userId를 담고 있는 Payload
-    { userId: user.userId },
-    accessTokenSecretKey,
-    // Token 유효기한 1시간 설정
-    { expiresIn: "1h" }
-  );
-  // Refresh token도 생성
-  const refreshToken = jwt.sign(
-    // userId를 담고 있는 Payload
-    { userId: user.userId },
-    refreshTokenSecretKey,
-    // Token 유효기한 1일 설정
-    { expiresIn: "1d" }
-  );
+  const refreshToken = jwt.sign({ userId: user.userId }, refreshTokenSecretKey, { expiresIn: "1d" });
+  redis.connect();
 
-  // Refresh token을 DB에 저장
-  await Refresh_tokens.create({ token: refreshToken, userId: user.userId });
+  await redis.set(refreshToken, user.userId);
+  await redis.expire(refreshToken, 60 * 60);
 
-  // 생성한 Token 반환
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+
   res.cookie("accessToken", accessToken);
   res.cookie("refreshToken", refreshToken);
   res.redirect("/posts");
@@ -143,12 +111,10 @@ router.post("/auth/login", [
 
 // 로그아웃 API
 router.get("/auth/logout", (req, res, next) => {
-  // Token을 초기화 한다.
-  res.clearCookie("authorization");
-
-  return res.status(200).json({
-    success: true,
-    message: "로그아웃 되었습니다."
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.render("posts", {
+    User: null
   });
 });
 
