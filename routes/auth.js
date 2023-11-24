@@ -85,7 +85,7 @@ router.post("/auth/login", [
 
   // 비밀번호 서로 일치여부 확인
   const hash = password;
-  const isValidPass = await comparePassword(confirmPassword, hash);
+  const isValidPass = await bcrypt.compare(confirmPassword, hash);
 
   if (!isValidPass) {
     return res.status(401).send({
