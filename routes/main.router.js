@@ -16,6 +16,7 @@ mainRouter.get("/posts", checkAuth, async (req, res) => {
     userId: 1,
     username: "이하늘"
   };
+
   if (!post) {
     return res.status(500).json({
       success: false,
@@ -66,7 +67,15 @@ mainRouter.get("/signup", (req, res) => {
 });
 
 mainRouter.get("/login", (req, res) => {
-  res.render("auth/login");
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+  if (accessToken && refreshToken) {
+    res.redirect("/posts");
+  } else {
+    res.render("auth/login", {
+      User: null
+    });
+  }
 });
 
 module.exports = mainRouter;
