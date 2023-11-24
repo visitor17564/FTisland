@@ -1,20 +1,66 @@
 const express = require("express");
 const mainRouter = express.Router();
+const { Posts } = require("../models");
 const temp = ["서울", "경기", "인천", "강원"];
 
-mainRouter.get("/login", (req, res) => {
-  res.render("auth/login");
+mainRouter.get("/", (req, res) => {
+  res.redirect("/posts");
+});
+
+// get all posts
+mainRouter.get("/posts", async (req, res) => {
+  const post = await Posts.findAll({});
+
+  if (!post) {
+    return res.status(500).json({
+      success: false,
+      message: "관광지를 조회할 수 없습니다."
+    });
+  }
+
+  res.render("posts", {
+    regions: temp,
+    posts: post
+  });
+});
+
+mainRouter.get("/posts/:postId", async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const post = await Posts.findOne({
+      where: { postId },
+      attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state"],
+      include: [
+        {
+          model: Users,
+          attributes: ["email"]
+        }
+      ]
+    });
+    if (!post.dataValues) {
+      return res.status(500).json({
+        success: false,
+        message: "관광지 조회에 실패 하였습니다."
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: post
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "서버에러."
+    });
+  }
 });
 
 mainRouter.get("/signup", (req, res) => {
   res.render("auth/signup");
 });
 
-mainRouter.get("/post", (req, res) => {
-  res.render("posts", {
-    regions: temp,
-    posts: temp
-  });
+mainRouter.get("/login", (req, res) => {
+  res.render("auth/login");
 });
 
 module.exports = mainRouter;
