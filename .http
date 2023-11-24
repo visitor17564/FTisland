@@ -64,10 +64,6 @@ Content-Type: application/json
   "confirmPassword": "test123"
 }
 
-### 상품삭제
-DELETE http://localhost:3000/api/product/2
-Content-Type: application/json
-
 ### 내가 팔로우하는 사람
 GET {{port}}/api/user/my_follows
 Content-Type: application/json
