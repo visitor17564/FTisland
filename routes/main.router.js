@@ -1,6 +1,6 @@
 const express = require("express");
 const mainRouter = express.Router();
-const { Posts } = require("../models");
+const { Posts, user } = require("../models");
 const temp = ["서울", "경기", "인천", "강원"];
 
 mainRouter.get("/", (req, res) => {
@@ -10,7 +10,10 @@ mainRouter.get("/", (req, res) => {
 // get all posts
 mainRouter.get("/posts", async (req, res) => {
   const post = await Posts.findAll({});
-
+  const user = {
+    userId: 1,
+    username: "이하늘"
+  };
   if (!post) {
     return res.status(500).json({
       success: false,
@@ -20,7 +23,8 @@ mainRouter.get("/posts", async (req, res) => {
 
   res.render("posts", {
     regions: temp,
-    posts: post
+    posts: post,
+    User: user
   });
 });
 

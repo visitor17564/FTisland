@@ -27,7 +27,7 @@ const verifyRefreshToken = async function (refreshAuthToken) {
 };
 
 // 사용자 인증 미들웨어
-module.exports = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   // split를 통해 분리 기준은 " "으로한다.
   // 배열구조분해할당으로 각각 할당한다.
   const [accessAuthType, accessAuthToken] = (accessToken = req.cookies.authorization.accessToken.split(" "));
@@ -95,4 +95,10 @@ module.exports = async (req, res, next) => {
       errorMessage: "로그인 후 이용 가능한 기능입니다."
     });
   }
+};
+
+const checkAuth = (req, res) => {};
+
+module.exports = {
+  authMiddleware
 };
