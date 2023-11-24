@@ -13,7 +13,7 @@ router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
       message: "데이터형식이 올바르지 않습니다."
     });
   }
-  const userId = req.user;
+  const { userId } = req.user;
   const post = new Posts({
     userId,
     title,
@@ -85,7 +85,7 @@ router.delete("/posts/:postId", authMiddleware, async (req, res) => {
   const userId2 = userId;
   try {
     const postId = req.params.postId;
-    const post = await Posts.findAll({
+    const post = await Posts.findOne({
       where: { postId }
     });
     if (!post) {
