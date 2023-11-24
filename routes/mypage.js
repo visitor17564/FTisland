@@ -13,14 +13,14 @@ const { User_infos } = require("../models");
 const { authMiddleware } = require("../middlewares/auth-middleware");
 
 // 비밀번호 비교 함수
-const comparePassword = async (password, hash) => {
-  try {
-    return await bcrypt.compare(password, hash);
-  } catch (error) {
-    console.log(error);
-  }
-  return false;
-};
+// const comparePassword = async (password, hash) => {
+//   try {
+//     return await bcrypt.compare(password, hash);
+//   } catch (error) {
+//     console.log(error);
+//   }
+//   return false;
+// };
 
 // 사용자 정보 생성 API
 router.post("/user/me", authMiddleware, async (req, res) => {
@@ -123,7 +123,7 @@ router.put("/user/me", authMiddleware, async (req, res) => {
 
     // 비밀번호 비교
     const hash = password;
-    const isValidPass = await comparePassword(confirmPassword, hash);
+    const isValidPass = await bcrypt.compare(confirmPassword, hash);
     // 비밀번호가 서로 일치하지 않는 경우
     if (!isValidPass) {
       return res.status(401).json({

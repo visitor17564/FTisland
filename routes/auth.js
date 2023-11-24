@@ -18,16 +18,6 @@ require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
-// 비밀번호 비교 함수
-const comparePassword = async (password, hash) => {
-  try {
-    return await bcrypt.compare(password, hash);
-  } catch (error) {
-    console.log(error);
-  }
-  return false;
-};
-
 // 회원가입 API
 router.post("/auth/signup", [
   // 빈 입력란 여부 체크 및 앞뒤 공백 제거
@@ -87,7 +77,7 @@ router.post("/auth/login", [
   body("email").isEmail().isLength({max:30}).withMessage("올바른 이메일 형식이 아닙니다.")
 
 ], validatorErrorCheck, async (req, res) => {
-  const { password } = res.locals.user;
+  
   // 이메일, 비밀번호를 데이터로 넘겨받음
   const { email, confirmPassword } = req.body;
 
@@ -105,8 +95,8 @@ router.post("/auth/login", [
   }
 
   // 비밀번호 서로 일치여부 확인
-  const hash = password;
-  const isValidPass = await comparePassword(confirmPassword, hash);
+  const hash = user.password;
+  const isValidPass = await bcrypt.compare(confirmPassword, hash);
 
   if (!isValidPass) {
     return res.status(401).send({
