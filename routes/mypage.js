@@ -25,7 +25,7 @@ const comparePassword = async (password, hash) => {
 // 사용자 정보 생성 API
 router.post("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.user;
+    const { userId } = req.user;
     const { profile, region, nation, follow } = req.body;
 
     // 빈 입력란 여부 체크
