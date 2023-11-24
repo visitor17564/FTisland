@@ -11,13 +11,8 @@ mainRouter.get("/", (req, res) => {
 
 // get all posts
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res) => {
-  const a = res.locals.user;
-  console.log(a);
   const post = await Posts.findAll();
-  const user = {
-    userId: 1,
-    username: "이하늘"
-  };
+  const user = req.user;
 
   if (!post) {
     return res.status(500).json({
