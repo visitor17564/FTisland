@@ -11,6 +11,13 @@ const router = express.Router();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
+redis.on("connect", () => {
+  console.info("Redis connected!");
+});
+redis.on("error", (err) => {
+  console.error("Redis Client Error", err);
+});
+redis.connect();
 // routers
 // 회원가입 API
 router.post("/auth/signup", async (req, res) => {
@@ -86,17 +93,14 @@ router.post("/auth/login", async (req, res) => {
       errorMessage: "비밀번호가 일치하지 않습니다."
     });
   }
-  const accessToken = jwt.sign({ userId: user.userId }, accessTokenSecretKey, { expiresIn: "1h" });
-
+  const accessToken = jwt.sign({ userId: user.userId }, accessTokenSecretKey, { expiresIn: "30m" });
   const refreshToken = jwt.sign({ userId: user.userId }, refreshTokenSecretKey, { expiresIn: "1d" });
-  redis.connect();
 
   await redis.set(refreshToken, user.userId);
   await redis.expire(refreshToken, 60 * 60);
 
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-
   res.cookie("accessToken", accessToken);
   res.cookie("refreshToken", refreshToken);
   res.redirect("/posts");
@@ -109,6 +113,22 @@ router.get("/auth/logout", (req, res, next) => {
   res.render("posts", {
     User: null
   });
+});
+// 하나로 합치
+router.get("/auth/refresh", async (req, res, next) => {
+  console.log("refresh");
+  const refreshToken = req.cookies.refreshToken;
+
+  const getRedis = await redis.get(refreshToken);
+  if (!getRedis) {
+    next(new Error("NotFoundRefreshTokenInDB"));
+  }
+
+  const accessToken = jwt.sign({ userId: getRedis }, accessTokenSecretKey, { expiresIn: "30m" });
+
+  res.clearCookie("accessToken");
+  res.cookie("accessToken", accessToken);
+  res.redirect("back");
 });
 
 // router 모듈 내보내기

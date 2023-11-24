@@ -21,16 +21,14 @@
 
         <% posts.forEach((post)=> { %>
           <div class="card mb-3">
-            <%- include('../partials/card') %>
+            <%- include('../partials/card', {post : post}) %>
           </div>
           <% }) %>
       </div>
     </div>
   </div>
 
-  <div class="container">
-    <%- include('../partials/post.item.ejs') %>
-  </div>
+
   <%- include('../partials/post_modal') %>
 
     <%- include('../partials/footer') %>
