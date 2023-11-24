@@ -10,7 +10,7 @@ mainRouter.get("/", (req, res) => {
 });
 
 // get all posts
-mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res) => {
+mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
   const post = await Posts.findAll();
   const user = req.user;
 
@@ -28,35 +28,28 @@ mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res) => {
   });
 });
 
-mainRouter.get("/posts/:postId", async (req, res) => {
-  try {
-    const postId = req.params.postId;
-    const post = await Posts.findOne({
-      where: { postId },
-      attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state"],
-      include: [
-        {
-          model: Users,
-          attributes: ["email"]
-        }
-      ]
-    });
-    if (!post.dataValues) {
-      return res.status(500).json({
-        success: false,
-        message: "관광지 조회에 실패 하였습니다."
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      data: post
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "서버에러."
-    });
+mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, next) => {
+  const { userId } = req.user;
+  const postId = req.params.postId;
+
+  const post = await Posts.findOne({
+    where: { postId },
+    attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state"],
+    include: [
+      {
+        model: Users,
+        attributes: ["email"]
+      }
+    ]
+  });
+
+  if (!post) {
+    next(new Error(`NotPostFound`));
   }
+  res.render("post_detail/", {
+    userId: userId,
+    post: post
+  });
 });
 
 mainRouter.get("/user/:id", authMiddleware, async (req, res, next) => {
