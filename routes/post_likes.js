@@ -15,15 +15,16 @@ const target_type = 2;
 
 // 내가 좋아하는 게시글 조회API(수정필요)
 router.get("/user/my_liked_posts", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   // user와 user_info의 id가 일치하는 것을 찾는다.
   const myLikedTargetId = await Likes.findAll({
-    attributes: ["targetId"],
+    attributes: [],
     where: { userId, target_type },
     include: [
       {
         model: Posts,
-        where: { postId: targetId }
+        where: { postId: targetId },
+        attributes: []
       }
     ]
   });
@@ -38,30 +39,30 @@ router.get("/user/my_liked_posts", authMiddleware, async (req, res) => {
 });
 
 // 특정 글 좋아하는 사람 조회API
-router.get("/posts/likes", async (req, res) => {
-  const { postId } = res.locals.user;
+router.get("/posts/likes/:postId", async (req, res) => {
+  const { postId } = req.params.postId;
 
   // user와 user_info의 id가 일치하는 것을 찾는다.
-  const postLiker = await Likes.findAll({
-    attributes: ["userId"],
+  const postLikers = await Likes.findAll({
+    attributes: [[Sequelize.col("user.username"), "username"]],
     where: { targetId: postId, target_type },
-    include: [{ model: Users, attributes: ["username"] }]
+    include: [{ model: Users, attributes: [] }]
   });
 
-  if (!postLiker.length) {
+  if (!postLikers.length) {
     return res.status(404).send({
       success: false,
-      errorMessage: "해달글을 좋아하는 사람이 없습니다."
+      errorMessage: "해당글을 좋아하는 사람이 없습니다."
     });
   }
 
-  res.status(200).json({ success: true, data: postLiker });
+  res.status(200).json({ success: true, data: postLikers });
 });
 
 // Like버튼 누르기
 router.post("/posts/likes", authMiddleware, async (req, res) => {
   // 구조분해할당
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   const { targetId } = req.body;
 
   const checkLikes = await Likes.findAll({
@@ -71,19 +72,19 @@ router.post("/posts/likes", authMiddleware, async (req, res) => {
   if (checkLikes.length) {
     return res.status(400).send({
       success: false,
-      errorMessage: "이미 팔로우중입니다."
+      errorMessage: "이미 좋아하는중입니다."
     });
   }
 
-  // 인증미들웨어만 통과하면 follow 등록
+  // 인증미들웨어만 통과하면 Likes 등록
   await Likes.create({ userId, targetId, target_type });
   res.status(201).json({ success: true, Message: "Like 성공!" });
 });
 
-// follow 취소버튼 누르기
+// Likes 취소버튼 누르기
 router.delete("/posts/likes", authMiddleware, async (req, res) => {
   // 구조분해할당
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   const { targetId } = req.body;
 
   // 인증미들웨어만 통과하면 follow 등록

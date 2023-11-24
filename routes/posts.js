@@ -3,36 +3,30 @@ const router = express.Router();
 const { Posts, Users, Comment } = require("../models");
 // const Comment = require("../models/comments");
 const Post = require("../models/posts");
+const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
 
 //여행지 등록
-router.post("/posts", async (req, res) => {
-  try {
-    const { title, subtitle, region, contents } = req.body;
-    if (!title || !subtitle || !region || !contents) {
-      return res.status(400).json({
-        success: false,
-        message: "데이터형식이 올바르지 않습니다."
-      });
-    }
-    const post = new Posts({
-      userId: 1,
-      title,
-      subtitle,
-      region,
-      contents,
-      state: "true"
-    });
-    await post.save();
-    return res.status(200).json({
-      success: true,
-      message: "관광지를 등록하였습니다."
-    });
-  } catch (err) {
-    return res.status(500).json({
+router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
+  const { title, region, contents } = req.body;
+  if (!title || !region || !contents) {
+    return res.status(400).json({
       success: false,
-      message: "관광지 등록에 실패하였습니다."
+      message: "데이터형식이 올바르지 않습니다."
     });
   }
+  const userId = req.user.userId;
+  const post = new Posts({
+    userId,
+    title,
+    region,
+    contents,
+    state: "true"
+  });
+  const temp = await post.save();
+  if (!temp) {
+    next(new Error("postRegisterError"));
+  }
+  res.redirect("/posts");
 });
 
 //관광지 수정

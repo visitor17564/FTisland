@@ -12,12 +12,12 @@ const { authMiddleware } = require("../middlewares/auth-middleware");
 
 // 내가 팔로우하는 사람 조회API
 router.get("/user/my_follows", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   // user와 user_info의 id가 일치하는 것을 찾는다.
   const followers = await Follows.findAll({
-    attributes: ["targetId"],
-    where: { userId: userId },
-    include: [{ model: Users, attributes: ["username"] }]
+    attributes: [[Sequelize.col("user.username"), "username"]],
+    where: { userId },
+    include: [{ model: Users, attributes: [] }]
   });
 
   if (!followers.length) {
@@ -31,11 +31,11 @@ router.get("/user/my_follows", authMiddleware, async (req, res) => {
 
 // 나를 팔로우하는 사람 조회API
 router.get("/user/my_followers", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
 
   // user와 user_info의 id가 일치하는 것을 찾는다.
   const followers = await Follows.findAll({
-    attributes: ["userId"],
+    attributes: [[Sequelize.col("user.username"), "username"]],
     where: { targetId: userId },
     include: [{ model: Users, attributes: ["username"] }]
   });
@@ -53,7 +53,7 @@ router.get("/user/my_followers", authMiddleware, async (req, res) => {
 // follow버튼 누르기
 router.post("/user/my_follows", authMiddleware, async (req, res) => {
   // 구조분해할당
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   const { targetId } = req.body;
 
   const checkFollows = await Follows.findAll({
@@ -75,10 +75,10 @@ router.post("/user/my_follows", authMiddleware, async (req, res) => {
 // follow 취소버튼 누르기
 router.delete("/user/my_follows", authMiddleware, async (req, res) => {
   // 구조분해할당
-  const { userId } = res.locals.user;
+  const { userId } = req.user;
   const { targetId } = req.body;
 
-  // 인증미들웨어만 통과하면 follow 등록
+  // 인증미들웨어만 통과하면 follow 삭제
   await Follows.destroy({
     where: {
       userId,
