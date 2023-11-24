@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Posts, Users, Comment } = require("../models");
-const { authMiddleware } = require("../middlewares/auth-middleware.js");
-// const Comment = require("../models/comments");
+const { Posts, Users, Comments } = require("../models");
 const Post = require("../models/posts");
 const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
 
@@ -131,11 +129,11 @@ router.post("/posts/:postId/comments", async (req, res) => {
         message: "포스트를 찾을 수 없습니다."
       });
     }
-    const comment = await Comment.create({ content, userId, postId });
+    const comments = await Comments.create({ content, userId, postId });
     res.status(201).json({
       success: true,
       message: "댓글이 등록되었습니다.",
-      comment
+      comments
     });
   } catch (err) {
     console.log(err);
@@ -150,14 +148,14 @@ router.get("/posts/:postId/comments", async (req, res) => {
   const postId = req.params.postId;
   try {
     const post = await Post.findByPk(postId, {
-      include: { model: Comment }
+      include: { model: Comments }
     });
     if (!post) {
       return res.status(404).json({
         message: "포스트를 찾을 수 없습니다."
       });
     }
-    res.status(200).json({ comment: post.comments });
+    res.status(200).json({ comments: post.comments });
   } catch (err) {
     res.status(500).json({
       message: "서버 오류."
