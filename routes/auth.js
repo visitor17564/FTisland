@@ -97,6 +97,8 @@ router.post("/auth/login", [
   const user = await Users.findOne({
     where: { email }
   });
+
+  // 유저 존재 유무 확인
   if (!user) {
     return res.status(401).send({
       success: false,

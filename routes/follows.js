@@ -15,9 +15,9 @@ router.get("/user/my_follows", authMiddleware, async (req, res) => {
   const { userId } = res.locals.user;
   // user와 user_info의 id가 일치하는 것을 찾는다.
   const followers = await Follows.findAll({
-    attributes: ["targetId"],
-    where: { userId: userId },
-    include: [{ model: Users, attributes: ["username"] }]
+    attributes: [[Sequelize.col("user.username"), "username"]],
+    where: { userId },
+    include: [{ model: Users, attributes: [] }]
   });
 
   if (!followers.length) {
@@ -35,7 +35,7 @@ router.get("/user/my_followers", authMiddleware, async (req, res) => {
 
   // user와 user_info의 id가 일치하는 것을 찾는다.
   const followers = await Follows.findAll({
-    attributes: ["userId"],
+    attributes: [[Sequelize.col("user.username"), "username"]],
     where: { targetId: userId },
     include: [{ model: Users, attributes: ["username"] }]
   });
@@ -78,7 +78,7 @@ router.delete("/user/my_follows", authMiddleware, async (req, res) => {
   const { userId } = res.locals.user;
   const { targetId } = req.body;
 
-  // 인증미들웨어만 통과하면 follow 등록
+  // 인증미들웨어만 통과하면 follow 삭제
   await Follows.destroy({
     where: {
       userId,

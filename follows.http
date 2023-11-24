@@ -90,6 +90,10 @@ Content-Type: application/json
   "status": "SOLD_OUT"
 }
 
+### 상품삭제
+DELETE {{port}}/api/posts/2
+Content-Type: application/json
+
 ### 내가 팔로우하는 사람
 GET {{port}}/api/user/my_follows
 Content-Type: application/json
