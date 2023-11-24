@@ -1,5 +1,5 @@
 function errorHandler(errorName, req, res) {
-  switch (errName) {
+  switch (errorName) {
     // auth.js 에러들
     case "ExistingEmail":
       return res.status(409).send({
@@ -72,3 +72,7 @@ function errorHandler(errorName, req, res) {
       });
   }
 }
+
+module.exports = {
+  errorHandler
+};
