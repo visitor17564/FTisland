@@ -6,6 +6,7 @@ const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
 const mainRouter = require("./routes/main.router.js");
 const followRouter = require("./routes/follows.js");
+const { errorHandler } = require("./middlewares/error-handler.js");
 
 //const { errorHandler } = require("./middlewares/error.handler.js");
 const path = require("path");

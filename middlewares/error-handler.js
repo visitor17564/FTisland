@@ -73,3 +73,7 @@ function errorHandler(errorName, req, res) {
       });
   }
 }
+
+module.exports = {
+  errorHandler
+};

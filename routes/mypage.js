@@ -1,38 +1,37 @@
-// 모듈 가져오기
+// import
 const express = require("express");
 const bcrypt = require("bcrypt");
-
-// router 가져오기
-const router = express.Router();
-
-// 모델 가져오기
 const { Users } = require("../models");
 const { User_infos } = require("../models");
-
-// 미들웨어 가져오기
+const { body } = require("express-validator");
+const { validatorErrorCheck } = require("../middlewares/validatorErrorCheck-middleware");
 const { authMiddleware } = require("../middlewares/auth-middleware");
 
-// 비밀번호 비교 함수
-const comparePassword = async (password, hash) => {
-  try {
-    return await bcrypt.compare(password, hash);
-  } catch (error) {
-    console.log(error);
-  }
-  return false;
-};
+// mypage.js - global variables
+const router = express.Router();
 
 // 사용자 정보 생성 API
-router.post("/user/me", authMiddleware, async (req, res) => {
+router.post("/user/me", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("profile").notEmpty().trim().withMessage("프로필이 비어있습니다."),
+  body("region").notEmpty().trim().withMessage("지역이 비어있습니다."),
+  body("nation").notEmpty().trim().withMessage("국가가 비어있습니다."),
+  body("follow").notEmpty().trim().withMessage("팔로우가 비어있습니다.")
+
+], validatorErrorCheck, authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.user;
+    const { userId } = req.user;
     const { profile, region, nation, follow } = req.body;
 
-    // 빈 입력란 여부 체크
-    if (!profile || !region || !nation || !follow) {
-      return res.status(401).send({
+    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
+    const user = await Users.findOne({
+      where: { userId: userId }
+    });
+    
+    if (!user) {
+      return res.status(400).json({
         success: false,
-        errorMessage: "입력란 중 비어있는 곳이 있습니다."
+        errorMessage: "사용자를 찾을 수 없습니다."
       });
     }
 
@@ -44,6 +43,7 @@ router.post("/user/me", authMiddleware, async (req, res) => {
     // 사용자 정보가 존재하지 않으면 새로운 사용자 정보를 생성한다.
     if (!user_info) {
       await User_infos.create({
+        userId: userId,
         profile: profile,
         region: region,
         nation: nation,
@@ -102,11 +102,27 @@ router.get("/user/me", authMiddleware, async (req, res) => {
 });
 
 // 사용자 정보 수정 API
-router.put("/user/me", authMiddleware, async (req, res) => {
-  try {
-    const { userId, password } = res.locals.user;
-    const { profile, region, nation, follow, confirmPassword } = req.body;
+router.put("/user/me", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("profile").notEmpty().trim().withMessage("프로필이 비어있습니다."),
+  body("region").notEmpty().trim().withMessage("지역이 비어있습니다."),
+  body("nation").notEmpty().trim().withMessage("국가가 비어있습니다."),
+  body("follow").notEmpty().trim().withMessage("팔로우가 비어있습니다."),
+  body("confirmPassword").notEmpty().trim().withMessage("확인용 비밀번호가 비어있습니다.")
 
+], validatorErrorCheck, authMiddleware, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { profile, region, nation, follow, confirmPassword } = req.body;
+    
+    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
+    const user = await Users.findOne({
+      where: { userId: userId }
+    });
+
+    // 구조분해할당으로 user의 password를 가져온다.
+    const { password } = user
+    
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
     const user_info = await User_infos.findOne({
       where: { userId: userId }
@@ -121,8 +137,8 @@ router.put("/user/me", authMiddleware, async (req, res) => {
     }
 
     // 비밀번호 비교
-    const hash = password;
-    const isValidPass = await comparePassword(confirmPassword, hash);
+    const isValidPass = await bcrypt.compare(confirmPassword, password);
+    console.log(isValidPass)
     // 비밀번호가 서로 일치하지 않는 경우
     if (!isValidPass) {
       return res.status(401).json({
@@ -147,16 +163,19 @@ router.put("/user/me", authMiddleware, async (req, res) => {
   }
 });
 
-// 사용자 정보 삭제
+// 사용자 및 정보 삭제
 router.delete("/user/me", authMiddleware, async (req, res) => {
   try {
-    const { userId, password } = res.locals.user;
+    const { userId } = req.user;
     const { confirmPassword } = req.body;
 
     // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
     const user = await Users.findOne({
       where: { userId: userId }
     });
+
+    // 구조분해할당으로 user의 password를 가져온다.
+    const { password } = user
 
     // 사용자가 없는 경우
     if (!user) {
@@ -167,8 +186,7 @@ router.delete("/user/me", authMiddleware, async (req, res) => {
     }
 
     // 비밀번호 비교
-    const hash = password;
-    const isValidPass = await comparePassword(confirmPassword, hash);
+    const isValidPass = await bcrypt.compare(confirmPassword, password);
     // 비밀번호가 서로 일치하지 않는 경우
     if (!isValidPass) {
       return res.status(401).json({

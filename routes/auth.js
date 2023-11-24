@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { Users } = require("../models");
 const { redis } = require("../config/config");
+const { body } = require("express-validator");
+const { validatorErrorCheck } = require("../middlewares/validatorErrorCheck-middleware");
 require("dotenv").config();
 
 // auth.js - global variables
@@ -20,33 +22,40 @@ redis.on("error", (err) => {
 redis.connect();
 // routers
 // 회원가입 API
-router.post("/auth/signup", async (req, res) => {
-  //  validate 추가
-  const { email, username, password, confirmPassword } = req.body;
-  if (!email || !username || !password || !confirmPassword) {
-    return res.status(401).send({
-      success: false,
-      errorMessage: "입력란 중 비어있는 곳이 있습니다."
-    });
-  }
+router.post("/auth/signup", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("email").notEmpty().trim().withMessage("이메일이 비어있습니다."),
+  body("username").notEmpty().trim().withMessage("이름이 비어있습니다."),
+  body("password").notEmpty().trim().withMessage("비밀번호가 비어있습니다."),
+  body("confirmPassword").notEmpty().trim().withMessage("확인용 비밀번호가 비어있습니다."),
 
-  // 비밀번호 최소 6자 이상, 비밀번호 일치 여부 확인
-  if (password.length < 6 || password !== confirmPassword) {
-    return res.status(401).send({
-      success: false,
-      errorMessage: "비밀번호가 최소 6자 이상이어야 하며, 서로 일치해야 합니다."
-    });
-  }
-
-  // 이메일 정규식
-  const emailRegex = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
   // 이메일 형식 체크
-  if (!emailRegex.test(email)) {
-    return res.status(401).send({
-      success: false,
-      errorMessage: "올바른 이메일 형식이 아닙니다."
-    });
-  }
+  body("email").isEmail().isLength({max:30}).withMessage("올바른 이메일 형식이 아닙니다."),
+  
+  // 비밀번호 6자 이상, 일치 여부 확인
+  body("password").isLength({min:6}).withMessage("비밀번호는 최소 6자 이상입니다."),
+  body("confirmPassword").custom((confirmPassword, {req}) => {
+    if(confirmPassword !== req.body.password) {
+      return false;
+    }
+    return true;
+  }).withMessage("비밀번호가 서로 일치하지 않습니다."),
+
+  // 이메일 형식 체크
+  body("email").isEmail().isLength({max:30}).withMessage("올바른 이메일 형식이 아닙니다."),
+  
+  // 비밀번호 6자 이상, 일치 여부 확인
+  body("password").isLength({min:6}).withMessage("비밀번호는 최소 6자 이상입니다."),
+  body("confirmPassword").custom((confirmPassword, {req}) => {
+    if(confirmPassword !== req.body.password) {
+      return false;
+    }
+    return true;
+  }).withMessage("비밀번호가 서로 일치하지 않습니다.")
+
+], validatorErrorCheck, async (req, res) => {
+  // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
+  const { email, username, password } = req.body;
 
   // 이메일이 중복되는지 확인하기 위해 가져온다.
   const existEmail = await Users.findAll({
@@ -69,9 +78,18 @@ router.post("/auth/signup", async (req, res) => {
   res.redirect("/login");
 });
 
+
 // 로그인 API
-router.post("/auth/login", async (req, res) => {
-  console.log(req.body);
+router.post("/auth/login", [
+  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+  body("email").notEmpty().trim().withMessage("이메일이 비어있습니다."),
+  body("password").notEmpty().trim().withMessage("비밀번호가 비어있습니다."),
+
+  // 이메일 형식 체크
+  body("email").isEmail().isLength({max:30}).withMessage("올바른 이메일 형식이 아닙니다.")
+
+], validatorErrorCheck, async (req, res) => {
+  // 이메일, 비밀번호를 데이터로 넘겨받음
   const { email, password } = req.body;
 
   // 해당 이메일을 가진 유저를 데이터베이스에서 찾는다.
@@ -86,8 +104,12 @@ router.post("/auth/login", async (req, res) => {
       errorMessage: "해당 이메일을 가진 유저가 존재하지 않습니다."
     });
   }
-  const matchPassword = await bcrypt.compare(password, user.password);
-  if (!matchPassword) {
+
+  // 비밀번호 서로 일치여부 확인
+  const hash = user.password
+  const isValidPass = await bcrypt.compare(password, hash);
+
+  if (!isValidPass) {
     return res.status(401).send({
       success: false,
       errorMessage: "비밀번호가 일치하지 않습니다."
