@@ -91,8 +91,8 @@ router.get("/user/me", authMiddleware, async (req, res) => {
     // 사용자 정보 보여주기
     return res.status(200).json({
       success: true,
-      data: user });
-      
+      data: user
+    });
   } catch (err) {
     res.status(500).json({
       success: false,

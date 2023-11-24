@@ -1,0 +1,41 @@
+<div class="modal fade" id="newpost">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>여행정보 작성</h5>
+        <button type="button" class="btn-close close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="/posts" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="form-group">
+            <div class="form-floating mb-3">
+              <select class="form-select" id="floatingSelectGrid" aria-label="Floating label select example">
+                <option selected>지역</option>
+                <option value="1">서울</option>
+                <option value="2">인천</option>
+                <option value="3">경기</option>
+              </select>
+              <label for="floatingSelectGrid">Works with selects</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="title" placeholder="제목을 적어주세요." required>
+              <label for="Post_title">Title</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <textarea class="form-control" placeholder="여행정보를 적어주세요." id="contents" style="height: 100px"
+                required></textarea>
+              <label for="Post_contents">Contents</label>
+            </div>
+          </div>
+          <div class="form-group mb-1">
+            <input class="form-control" type="file" name="image">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">생성하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

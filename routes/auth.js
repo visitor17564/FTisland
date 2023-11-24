@@ -15,8 +15,8 @@ const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 회원가입 API
 router.post("/auth/signup", async (req, res) => {
-    // 이메일, 유저네임, 비밀번호, 확인용 비밀번호를 데이터로 넘겨받음
-    const { email, username, password, confirmPassword } = req.body;
+  // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
+  const { email, username, password, confirmPassword } = req.body;
 
   // 빈 입력란 여부 체크
   if (!email || !username || !password || !confirmPassword) {
@@ -127,13 +127,13 @@ router.post("/auth/login", async (req, res) => {
 
 // 로그아웃 API
 router.get("/auth/logout", (req, res, next) => {
-    // Token을 초기화 한다.
-    res.clearCookie("authorization");
+  // Token을 초기화 한다.
+  res.clearCookie("authorization");
 
   return res.status(200).json({
     success: true,
     message: "로그아웃 되었습니다."
-    });
+  });
 });
 
 // router 모듈 내보내기

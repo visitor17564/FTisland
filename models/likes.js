@@ -11,9 +11,37 @@ module.exports = (sequelize, DataTypes) => {
   }
   Likes.init(
     {
-      userId: DataTypes.STRING,
-      targetId: DataTypes.STRING,
-      target_type: DataTypes.STRING
+      likeId: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER
+      },
+      UserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Users",
+          key: "userId"
+        },
+        onDelete: "CASCADE"
+      },
+      targetId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      target_type: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      }
     },
     {
       sequelize,
