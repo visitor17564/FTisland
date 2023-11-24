@@ -1,5 +1,7 @@
 // jwt모듈 가져오기
 const jwt = require("jsonwebtoken");
+
+const { redis } = require("../config/config");
 // users 모델가져오기
 const { Users, Refresh_tokens } = require("../models");
 // Secret_key
@@ -7,41 +9,31 @@ require("dotenv").config();
 const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
-// 토큰 변수선언
-// AccessToken을 검증하는 함수를 선언해둠
-const verifyAccessToken = async function (accessAuthToken) {
-  try {
-    return jwt.verify(accessAuthToken, accessTokenSecretKey);
-  } catch (err) {
-    return false;
-  }
-};
-
-// RefreshToken을 검증하는 함수를 선언해둠
-const verifyRefreshToken = async function (refreshAuthToken) {
-  try {
-    return jwt.verify(refreshAuthToken, refreshTokenSecretKey);
-  } catch (err) {
-    return false;
-  }
-};
-
 // 사용자 인증 미들웨어
 const authMiddleware = async (req, res, next) => {
-  // split를 통해 분리 기준은 " "으로한다.
-  // 배열구조분해할당으로 각각 할당한다.
-  const [accessAuthType, accessAuthToken] = (accessToken = req.cookies.authorization.accessToken.split(" "));
-  const [refreshAuthType, refreshAuthToken] = (refreshToken = req.cookies.authorization.refreshToken.split(" "));
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.accessToken;
+  res.clearCookie("accessToken");
+  const verifiedAccessToken = jwt.verify(accessToken, accessTokenSecretKey, (err, user) => {
+    if (err) throw next(err);
+    console.log(user);
 
-  const verifiedAccessToken = verifyAccessToken(accessAuthToken);
-  const accessTokenUserId = await verifiedAccessToken.then((res) => {
-    return res.userId;
+    next();
   });
 
-  const verifiedRefreshToken = verifyRefreshToken(refreshAuthToken);
-  const refreshTokenUserId = await verifiedRefreshToken.then((res) => {
-    return res.userId;
-  });
+  if (verifiedAccessToken) {
+    res.locals.user = verifiedAccessToken;
+    return next();
+  }
+
+  // const verifiedRefreshToken = verifyRefreshToken(refreshToken);
+  // // 임시로
+  // if (verifiedRefreshToken) {
+  //   req.user = verifiedRefreshToken;
+  //   return next();
+  // }
+
+  /*
 
   // RefreshToken은 DB에서도 뒤져둬야함
   const findDbRefreshToken = await Refresh_tokens.findOne({ where: { token: refreshAuthToken } });
@@ -75,19 +67,17 @@ const authMiddleware = async (req, res, next) => {
       return;
     }
   }
-
+*/
   // AccessToken이 검증에 실패할 경우 RefreshToken이 있는지 확인
-  if (findDbRefreshToken && refreshAuthType === "Bearer") {
+  if (accessToken && refreshToken) {
     // RefreshToken이 있을 경우 AccessToken을 생성, 데이터 반환
-    const recreatedAccessToken = jwt.sign({ userId: refreshTokenUserId }, accessTokenSecretKey, { expiresIn: "1h" });
-    const user = await Users.findOne({ where: { userId: refreshTokenUserId } });
-    res.locals.user = user;
-    res.clearCookie("authorization");
-    res.cookie("authorization", {
-      accessToken: `Bearer ${recreatedAccessToken}`,
-      refreshToken: `Bearer ${refreshAuthToken}`
-    });
-    return;
+    const newAccessToken = jwt.sign({ userId: accessToken }, accessTokenSecretKey, { expiresIn: "1h" });
+
+    const verifiedNewAccessToken = verifyRefreshToken(newAccessToken);
+    res.user = verifiedNewAccessToken;
+
+    res.cookie("accessToken", newAccessToken);
+
     next();
   } else {
     return res.status(401).send({
@@ -100,17 +90,7 @@ const authMiddleware = async (req, res, next) => {
 const checkAuth = (req, res, next) => {
   const accessToken = req.cookies.accessToken;
   const refreshToken = req.cookies.refreshToken;
-  console.log(accessToken);
-  if (accessToken && refreshToken) {
-    next();
-  } else {
-    res.redirect("/login");
-  }
-};
-//임시용 쿠키값 있는지 확인
-const checkCookies = (req, res, next) => {
-  const accessToken = req.cookies.accessToken;
-  const refreshToken = req.cookies.refreshToken;
+
   if (accessToken && refreshToken) {
     next();
   } else {
@@ -118,6 +98,23 @@ const checkCookies = (req, res, next) => {
   }
 };
 
+// AccessToken을 검증하는 함수를 선언해둠
+const verifyAccessToken = function (accessAuthToken) {
+  try {
+    return jwt.verify(accessAuthToken, accessTokenSecretKey);
+  } catch (err) {
+    return false;
+  }
+};
+
+// RefreshToken을 검증하는 함수를 선언해둠
+const verifyRefreshToken = async function (refreshAuthToken) {
+  try {
+    return jwt.verify(refreshAuthToken, refreshTokenSecretKey);
+  } catch (err) {
+    return false;
+  }
+};
 module.exports = {
   authMiddleware,
   checkAuth
