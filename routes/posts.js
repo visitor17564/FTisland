@@ -54,7 +54,6 @@ router.put("/posts/:postId", authMiddleware, async (req, res) => {
       where: { postId }
     });
     const { userId } = post;
-    console.log("그래맞아" + userId);
     if (userId2 !== userId) {
       return res.status(401).json({
         success: false,
@@ -91,6 +90,8 @@ router.put("/posts/:postId", authMiddleware, async (req, res) => {
 
 //관광지 삭제
 router.delete("/posts/:postId", authMiddleware, async (req, res) => {
+  let { userId } = res.locals.user;
+  const userId2 = userId;
   try {
     const postId = req.params.postId;
     const post = await Posts.findAll({
@@ -102,7 +103,8 @@ router.delete("/posts/:postId", authMiddleware, async (req, res) => {
         message: "관광지 조회에 실패 하였습니다."
       });
     }
-    if (post.dataValues.postId !== res.locals.posts.dataValues.postId) {
+    const { userId } = post;
+    if (userId2 !== userId) {
       return res.status(401).json({
         success: false,
         message: "관광지를 삭제할 권한이 존재하지 않습니다."

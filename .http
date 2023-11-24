@@ -122,3 +122,8 @@ Content-Type: application/json
   "region": "파푸니카5",
   "contents": "라일라이5"
 }
+
+### 할배네 상품 삭제
+DELETE http://localhost:3000/api/posts/5
+Content-Type: application/json
+
