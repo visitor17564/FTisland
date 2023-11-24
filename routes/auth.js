@@ -2,6 +2,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { body, validationResult } = require("express-validator");
 
 // express모듈에서 router 가져오기
 const router = express.Router();
@@ -14,7 +15,14 @@ const accessTokenSecretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 회원가입 API
-router.post("/auth/signup", async (req, res) => {
+router.post("/auth/signup", [
+  // 빈 입력란 여부 체크
+
+  // 이메일 형식 체크
+  body("email").isEmail().withMessage("올바른 이메일 형식이 아닙니다.")
+],
+  
+  async (req, res) => {
   // 이메일, 유저네임, 비밀번호, 확인용비밀번호를 데이터로 넘겨받음
   const { email, username, password, confirmPassword } = req.body;
 
@@ -31,16 +39,6 @@ router.post("/auth/signup", async (req, res) => {
     return res.status(401).send({
       success: false,
       errorMessage: "비밀번호가 최소 6자 이상이어야 하며, 서로 일치해야 합니다."
-    });
-  }
-
-  // 이메일 정규식
-  const emailRegex = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
-  // 이메일 형식 체크
-  if (!emailRegex.test(email)) {
-    return res.status(401).send({
-      success: false,
-      errorMessage: "올바른 이메일 형식이 아닙니다."
     });
   }
 
