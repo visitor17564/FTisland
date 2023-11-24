@@ -144,7 +144,10 @@ router.put("/user/me", authMiddleware, async (req, res) => {
     })
 
   } catch (err) {
-    res.status(500).json({ success: false, message: "예기치 못한 오류가 발생하였습니다." });
+    res.status(500).json({ 
+      success: false,
+      message: "예기치 못한 오류가 발생하였습니다."
+    });
     console.log(err);
   }
 });
