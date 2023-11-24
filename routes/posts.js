@@ -13,7 +13,7 @@ router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
       message: "데이터형식이 올바르지 않습니다."
     });
   }
-  const userId = req.user.userId;
+  const userId = req.user;
   const post = new Posts({
     userId,
     title,
@@ -30,7 +30,7 @@ router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
 
 //관광지 수정
 router.put("/posts/:postId", authMiddleware, async (req, res) => {
-  let { userId } = res.locals.user;
+  let { userId } = req.user;
   const userId2 = userId;
   try {
     const postId = req.params.postId;
@@ -81,7 +81,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res) => {
 
 //관광지 삭제
 router.delete("/posts/:postId", authMiddleware, async (req, res) => {
-  let { userId } = res.locals.user;
+  let { userId } = req.user;
   const userId2 = userId;
   try {
     const postId = req.params.postId;
