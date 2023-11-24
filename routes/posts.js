@@ -7,38 +7,10 @@ const Post = require("../models/posts");
 const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
 
 //여행지 등록
-<<<<<<< HEAD
-router.post("/posts", authMiddleware, async (req, res) => {
-  const { userId } = res.locals.user;
-  try {
-    const { title, subtitle, region, contents } = req.body;
-    if (!title || !subtitle || !region || !contents) {
-      return res.status(400).json({
-        success: false,
-        message: "데이터형식이 올바르지 않습니다."
-      });
-    }
-    const post = new Posts({
-      userId,
-      title,
-      subtitle,
-      region,
-      contents,
-      state: "true"
-    });
-    await post.save();
-    return res.status(200).json({
-      success: true,
-      message: "관광지를 등록하였습니다."
-    });
-  } catch (err) {
-    return res.status(500).json({
-=======
 router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
   const { title, region, contents } = req.body;
   if (!title || !region || !contents) {
     return res.status(400).json({
->>>>>>> d23d068b82c27cbaf39364efeef38341b978d4a1
       success: false,
       message: "데이터형식이 올바르지 않습니다."
     });
