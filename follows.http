@@ -64,6 +64,8 @@ Content-Type: application/json
   "confirmPassword": "test123"
 }
 
+
+// 게시글 기능
 ### 여행지등록
 POST {{port}}/api/posts
 Content-Type: application/json
@@ -79,7 +81,7 @@ GET {{port}}/posts
 Content-Type: application/json
 
 ### 광광지개별조회
-GET {{port}}/posts/24
+GET {{port}}/posts/8
 Content-Type: application/json
 
 ### 광광지수정
@@ -93,8 +95,21 @@ Content-Type: application/json
   "contents": "배고픔"
 }
 
-### 상품삭제
+### 관광지삭제
 DELETE {{port}}/api/posts/24
+Content-Type: application/json
+
+// 댓글 기능
+### 댓글등록
+POST {{port}}/api/posts/8/comments
+Content-Type: application/json
+
+{
+  "text": "8번글에 댓글테스트입니다"
+}
+
+### 댓글조회
+GET {{port}}/api/posts/8/comments
 Content-Type: application/json
 
 
@@ -144,4 +159,26 @@ Content-Type: application/json
 
 ### 내가 좋아하는 게시물 보기
 GET {{port}}/api/user/my_liked_posts
+Content-Type: application/json
+
+### 특정글 좋아하는 사람 보기
+GET {{port}}/api/posts/8/likes
+Content-Type: application/json
+
+// 댓글 좋아요 기능
+
+### 댓글 좋아요 버튼 누르기
+POST {{port}}/posts/:postId/comments/:commentId/likes
+Content-Type: application/json
+
+### 댓글 좋아요 취소 누르기
+DELETE {{port}}/posts/:postId/comments/:commentId/likes
+Content-Type: application/json
+
+### 내가 좋아하는 댓글 보기
+GET {{port}}/api/user/my_liked_comments
+Content-Type: application/json
+
+### 특정댓글 좋아하는 사람 보기
+GET {{port}}/posts/:postId/comments/:commentId/likes
 Content-Type: application/json

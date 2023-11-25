@@ -36,23 +36,25 @@ router.get("/user/my_liked_posts", authMiddleware, async (req, res) => {
 
 // 특정 글 좋아하는 사람 조회API
 router.get("/posts/:postId/likes", async (req, res) => {
-  const { postId } = req.params.postId;
+  const { postId } = req.params;
 
   // user와 user_info의 id가 일치하는 것을 찾는다.
-  const postLikers = await Likes.findAll({
-    attributes: [[Sequelize.col("user.username"), "username"]],
-    where: { targetId: postId, target_type },
-    include: [{ model: Users, attributes: [] }]
-  });
+  const [result, metadata] = await sequelize.query(
+    "SELECT `Users`.`userId`, `Users`.`username` FROM `Likes` LEFT JOIN `Users` ON `Users`.`userId` = `Likes`.`userId` WHERE `Likes`.`target_type` = " +
+      `"${target_type}"` +
+      " AND `Likes`.`targetId` =" +
+      `"${postId}"` +
+      " AND `Users`.`userId` IS NOT NULL"
+  );
 
-  if (!postLikers.length) {
+  if (!result.length) {
     return res.status(404).send({
       success: false,
       errorMessage: "해당글을 좋아하는 사람이 없습니다."
     });
   }
 
-  res.status(200).json({ success: true, data: postLikers });
+  res.status(200).json({ success: true, data: result });
 });
 
 // Like버튼 누르기
