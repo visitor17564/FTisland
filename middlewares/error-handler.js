@@ -1,4 +1,5 @@
 function errorHandler(errorName, req, res) {
+  console.log(errorName);
   switch (errorName) {
     // auth.js 에러들
     case "ExistingEmail":

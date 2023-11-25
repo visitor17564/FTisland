@@ -13,7 +13,8 @@ mainRouter.get("/", (req, res) => {
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
   const post = await Posts.findAll();
   const user = req.user;
-
+  console.log("posts");
+  console.log(user);
   if (!post) {
     return res.status(500).json({
       success: false,
@@ -34,7 +35,7 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
 
   const post = await Posts.findOne({
     where: { postId },
-    attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state"],
+    attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state", "createdAt"],
     include: [
       {
         model: Users,
@@ -46,9 +47,24 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
   if (!post) {
     next(new Error(`NotPostFound`));
   }
+
+  const test = {
+    comment: {
+      userId: 8,
+      comments: "dsafadsf"
+    }
+  };
+
+  const comments = {
+    comment: test,
+    size: Object.keys(test).length
+  };
+
+  console.log(comments);
   res.render("post_detail/", {
-    userId: userId,
-    post: post
+    User: userId,
+    post: post.dataValues,
+    comments: comments
   });
 });
 

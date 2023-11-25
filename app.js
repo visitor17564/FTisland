@@ -27,7 +27,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 const publicDirectoryPath = path.join(__dirname, "public");
 app.use(express.static(publicDirectoryPath));
-const temp = ["서울", "경기", "인천", "강원"];
+const temp = ["전체", "서울", "경기", "인천", "강원"];
 // router middleware
 app.use("/api", [authRouter, mypageRouter, postsRouter, followRouter]);
 app.use("/", mainRouter);
