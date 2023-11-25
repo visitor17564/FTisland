@@ -22,10 +22,10 @@ Content-Type: application/json
 }
 
 ### 로그아웃
-GET http://localhost:3000/api/auth/logout
+GET {{port}}/api/auth/logout
 Content-Type: application/json
 
-### 내 정보 생성
+### 사용자 상세정보 생성
 POST {{port}}/api/user/me
 Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
@@ -51,49 +51,69 @@ Content-Type: application/json
   "profile": "프로필변경테스트",
   "region": "지역변경테스트",
   "nation": "국가변경테스트",
-  "follow": "팔로우변경테스트"
+  "follow": "팔로우변경테스트",
+  "confirmPassword": "test123"
 }
 
-### 상품등록
-POST http://localhost:3000/api/product
+### 회원탈퇴
+PUT {{port}}/api/user/me
+Authorization: accesstoken:{{accessToken}}, refreshToken:{{refreshToken}}
 Content-Type: application/json
 
 {
-  "title": "대방어",
-  "content": "맛있겠죠?"
+  "confirmPassword": "test123"
 }
 
-### 상품등록
-POST http://localhost:3000/api/product
+
+// 게시글 기능
+### 여행지등록
+POST {{port}}/api/posts
 Content-Type: application/json
 
 {
-  "title": "맛동산블랙",
-  "content": "갑자기먹고싶네"
+  "title": "대방어철",
+  "region": "겨울이되니깐",
+  "contents": "배고픔"
 }
 
-### 상품목록조회
-GET http://localhost:3000/api/products
+### 광광지목록조회
+GET {{port}}/posts
 Content-Type: application/json
 
-### 상품개별조회
-GET http://localhost:3000/api/product/2
+### 광광지개별조회
+GET {{port}}/posts/8
 Content-Type: application/json
 
-### 상품수정
-PUT http://localhost:3000/api/product/2
+### 광광지수정
+PUT {{port}}/api/posts/24
 Content-Type: application/json
 
 {
-  "title": "훠궈2",
-  "content": "배부르죠?2",
-  "status": "SOLD_OUT"
+  "title": "대방어철",
+  "subtitle": "곧 없어질 녀석임",
+  "region": "겨울이되니깐",
+  "contents": "배고픔"
 }
 
-### 상품삭제
-DELETE {{port}}/api/posts/2
+### 관광지삭제
+DELETE {{port}}/api/posts/24
 Content-Type: application/json
 
+// 댓글 기능
+### 댓글등록
+POST {{port}}/api/posts/8/comments
+Content-Type: application/json
+
+{
+  "text": "8번글에 댓글테스트입니다"
+}
+
+### 댓글조회
+GET {{port}}/api/posts/8/comments
+Content-Type: application/json
+
+
+// 팔로우기능
 ### 내가 팔로우하는 사람
 GET {{port}}/api/user/my_follows
 Content-Type: application/json
@@ -116,7 +136,7 @@ POST {{port}}/api/user/my_follows
 Content-Type: application/json
 
 {
-  "targetId" : 2
+  "targetId" : 39
 }
 
 ### follow취소 누르기
@@ -124,5 +144,41 @@ DELETE {{port}}/api/user/my_follows
 Content-Type: application/json
 
 {
-  "targetId" : 2
+  "targetId" : 3
 }
+
+// 게시글 좋아요 기능
+
+### 게시물 좋아요 버튼 누르기
+POST {{port}}/api/posts/6/likes
+Content-Type: application/json
+
+### 게시물 좋아요 취소 누르기
+DELETE {{port}}/api/posts/8/likes
+Content-Type: application/json
+
+### 내가 좋아하는 게시물 보기
+GET {{port}}/api/user/my_liked_posts
+Content-Type: application/json
+
+### 특정글 좋아하는 사람 보기
+GET {{port}}/api/posts/8/likes
+Content-Type: application/json
+
+// 댓글 좋아요 기능
+
+### 댓글 좋아요 버튼 누르기
+POST {{port}}/posts/:postId/comments/:commentId/likes
+Content-Type: application/json
+
+### 댓글 좋아요 취소 누르기
+DELETE {{port}}/posts/:postId/comments/:commentId/likes
+Content-Type: application/json
+
+### 내가 좋아하는 댓글 보기
+GET {{port}}/api/user/my_liked_comments
+Content-Type: application/json
+
+### 특정댓글 좋아하는 사람 보기
+GET {{port}}/posts/:postId/comments/:commentId/likes
+Content-Type: application/json
