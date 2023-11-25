@@ -11,7 +11,7 @@ const { Posts, Likes } = require("../models/index.js");
 const { authMiddleware } = require("../middlewares/auth-middleware");
 
 // 게시글
-const target_type = 2;
+const target_type = "글";
 
 // 내가 좋아하는 게시글 조회API(수정필요)
 router.get("/user/my_liked_posts", authMiddleware, async (req, res) => {
@@ -66,7 +66,7 @@ router.post("/posts/likes", authMiddleware, async (req, res) => {
   const { targetId } = req.body;
 
   const checkLikes = await Likes.findAll({
-    where: { targetId, userId, target_type }
+    where: { userId, targetId, target_type }
   });
 
   if (checkLikes.length) {
