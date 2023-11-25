@@ -135,17 +135,13 @@ Content-Type: application/json
 // 게시글 좋아요 기능
 
 ### 게시물 좋아요 버튼 누르기
-POST {{port}}/api/posts/likes
+POST {{port}}/api/posts/6/likes
 Content-Type: application/json
-
-{
-  "targetId" : 3
-}
 
 ### 게시물 좋아요 취소 누르기
-DELETE {{port}}/api/posts/likes
+DELETE {{port}}/api/posts/8/likes
 Content-Type: application/json
 
-{
-  "targetId" : 3
-}
+### 내가 좋아하는 게시물 보기
+GET {{port}}/api/user/my_liked_posts
+Content-Type: application/json

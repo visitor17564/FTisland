@@ -5,7 +5,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.Users, {
         targetKey: "userId",
-        foreignKey: "UserId"
+        foreignKey: "userId"
+      });
+      this.belongsTo(models.Posts, {
+        targetKey: "postId",
+        foreignKey: "targetId"
       });
     }
   }
