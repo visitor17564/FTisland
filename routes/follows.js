@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // 모델 가져오기
-const { Users, Follows } = require("../models");
+const { Users, Follows, Sequelize, sequelize } = require("../models");
 
 // 미들웨어 가져오기
 const { authMiddleware } = require("../middlewares/auth-middleware");
@@ -13,20 +13,20 @@ const { authMiddleware } = require("../middlewares/auth-middleware");
 // 내가 팔로우하는 사람 조회API
 router.get("/user/my_follows", authMiddleware, async (req, res) => {
   const { userId } = req.user;
-  // user와 user_info의 id가 일치하는 것을 찾는다.
-  const followers = await Follows.findAll({
-    attributes: [[Sequelize.col("user.username"), "username"]],
-    where: { userId },
-    include: [{ model: Users, attributes: [] }]
-  });
 
-  if (!followers.length) {
+  const [result, metadata] = await sequelize.query(
+    "SELECT `Users`.`username`, `Users`.`userId` FROM `Follows` LEFT JOIN `Users` ON `Follows`.`targetID` = `Users`.`userId` WHERE `Follows`.`userId` = " +
+      `${userId}` +
+      " AND `Users`.`username` IS NOT NULL"
+  );
+
+  if (!result.length) {
     return res.status(404).send({
       success: false,
       errorMessage: "팔로우하는 사람이 없습니다."
     });
   }
-  res.status(200).json({ success: true, data: followers });
+  res.status(200).json({ success: true, data: result });
 });
 
 // 나를 팔로우하는 사람 조회API
@@ -34,20 +34,20 @@ router.get("/user/my_followers", authMiddleware, async (req, res) => {
   const { userId } = req.user;
 
   // user와 user_info의 id가 일치하는 것을 찾는다.
-  const followers = await Follows.findAll({
-    attributes: [[Sequelize.col("user.username"), "username"]],
-    where: { targetId: userId },
-    include: [{ model: Users, attributes: ["username"] }]
-  });
+  const [result, metadata] = await sequelize.query(
+    "SELECT `Users`.`username`, `Users`.`userId` FROM `Users` LEFT JOIN `Follows` ON `Follows`.`userId` = `Users`.`userId` WHERE `Follows`.`targetId` = " +
+      `${userId}` +
+      " AND `Users`.`username` IS NOT NULL"
+  );
 
-  if (!followers.length) {
+  if (!result.length) {
     return res.status(404).send({
       success: false,
       errorMessage: "팔로워가 없습니다."
     });
   }
 
-  res.status(200).json({ success: true, data: followers });
+  res.status(200).json({ success: true, data: result });
 });
 
 // follow버튼 누르기
