@@ -47,4 +47,72 @@ router.get("/posts/:postId/comments", async (req, res) => {
   res.send(comments);
 });
 
+//댓글 수정
+router.put("/posts/:postId/comments/:commentsId", authMiddleware, async (req, res) => {
+  let loginId = req.user.userId;
+  const commentsId = req.params.commentsId;
+  const { text } = req.body;
+  if (!text) {
+    return res.status(400).json({
+      success: false,
+      message: "데이터형식이 올바르지 않습니다."
+    });
+  }
+  const comment = await Comments.findOne({
+    where: { commentsId }
+  });
+
+  const { userId } = comment;
+  if (loginId !== userId) {
+    return res.status(401).json({
+      success: false,
+      message: "댓글을 수정할 권한이 존재하지 않습니다."
+    });
+  }
+  const updatedAt = new Date();
+
+  Comments.update(
+    {
+      text,
+      updatedAt
+    },
+    {
+      where: { commentsId }
+    }
+  ).then(() => {
+    return res.status(200).json({
+      success: true,
+      message: "댓글을 수정하였습니다."
+    });
+  });
+});
+
+//댓글 삭제
+router.delete("/posts/:postId/comments/:commentsId", authMiddleware, async (req, res) => {
+  let loginId = req.user.userId;
+  const commentsId = req.params.commentsId;
+
+  const comment = await Comments.findOne({
+    where: { commentsId }
+  });
+
+  const { userId } = comment;
+  if (loginId !== userId) {
+    return res.status(401).json({
+      success: false,
+      message: "댓글을 삭제할 권한이 존재하지 않습니다."
+    });
+  }
+  const updatedAt = new Date();
+
+  Comments.destroy({
+    where: { commentsId }
+  }).then(() => {
+    return res.status(200).json({
+      success: true,
+      message: "댓글을 삭제하였습니다."
+    });
+  });
+});
+
 module.exports = router;
