@@ -37,6 +37,18 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE
+      },
+      introduce: {
+        type: DataTypes.STRING
+      },
+      mbti: {
+        type: DataTypes.STRING
+      },
+      githubUrl: {
+        type: DataTypes.STRING
+      },
+      blogUrl: {
+        type: DataTypes.STRING
       }
     },
     {

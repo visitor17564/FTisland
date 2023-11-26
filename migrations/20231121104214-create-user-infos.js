@@ -14,8 +14,7 @@ module.exports = {
         onDelete: "CASCADE"
       },
       profile: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING
       },
       region: {
         type: Sequelize.STRING
@@ -31,6 +30,18 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      introduce: {
+        type: Sequelize.STRING
+      },
+      mbti: {
+        type: Sequelize.STRING
+      },
+      githubUrl: {
+        type: Sequelize.STRING
+      },
+      blogUrl: {
+        type: Sequelize.STRING
       }
     });
   },
