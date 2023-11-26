@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+  <div class="container" style="max-width: 600px;">
+
+    <form method="POST" action="/api/user/:<%=currentUser %>">
+
+      <%- include('../partials/userInfo', {userInfo : userInfo}) %>
+    </form>
+
+  </div>
+
+
+  <%- include('../partials/footer') %>

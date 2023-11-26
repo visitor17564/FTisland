@@ -1,6 +1,6 @@
 const express = require("express");
 const mainRouter = express.Router();
-const { Posts, Users, User_infos, Comments, sequelize } = require("../models");
+const { Posts, Users, User_infos, Comments, Likes, sequelize } = require("../models");
 
 const { regionEnum } = require("../config/enum.js");
 const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
@@ -9,15 +9,13 @@ mainRouter.get("/", (req, res) => {
   res.redirect("/posts");
 });
 
-// get all posts
+// 메인페이지
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
   const cookieAccessToken = req.cookies.accessToken;
   const sort = req.query.sort ? req.query.sort : "DESC";
   const userId = res.locals.currentUser;
   const accessToken = res.locals.accessToken;
 
-  console.log("쿠키", cookieAccessToken);
-  console.log("로컬", accessToken);
   const posts = await Posts.findAll({
     attributes: [
       "userId",
@@ -57,7 +55,7 @@ mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => 
     currentUsername: username.dataValues.username
   });
 });
-
+// 상세 페이지
 mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, next) => {
   const userId = res.locals.currentUser;
   const postId = req.params.postId;
@@ -93,29 +91,36 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
   });
   const newComments = [];
   if (comments) {
-    for (const comment of comments) {
+    for (const key in comments) {
       const name = await Users.findOne({
         attributes: ["username"],
-        where: comment.dataValues.userId
+        where: comments[key].dataValues.userId
       });
+
       const newComment = {
-        ...comment.dataValues,
+        ...comments[key].dataValues,
         username: name.dataValues.username
       };
+
       newComments.push(newComment);
     }
   }
   const newPost = {
     ...post.dataValues
   };
-  console.log(newPost);
-  console.log(userId);
+
+  const postLike = await Likes.findOne({
+    attributes: ["state"],
+    where: { targetId: postId }
+  });
+
   res.cookie("accessToken", res.locals.accessToken);
   res.render("post_detail/", {
     currentUser: userId,
     currentUsername: newPost.username,
     posts: newPost,
-    comments: newComments
+    comments: newComments,
+    postLike: postLike.dataValues.state
   });
 });
 
@@ -144,52 +149,95 @@ mainRouter.get("/posts/:postId/edit", [checkAuth, authMiddleware], async (req, r
   const newPost = {
     ...post.dataValues
   };
-  console.log(newPost);
+
   res.cookie("accessToken", res.locals.accessToken).render("post_detail/edit.ejs", {
     post: post.dataValues,
     currentUser: res.locals.currentUser,
     currentUsername: newPost.username
   });
 });
+// 포스트 좋아요
+mainRouter.get("/posts/:postId/likes", [checkAuth, authMiddleware], async (req, res) => {
+  const userId = res.locals.currentUser;
+  const { postId } = req.params;
 
+  const countLikes = await Likes.count({
+    where: { userId, targetId: postId, target_type: "post" }
+  });
+  if (countLikes === 0) {
+    await Likes.create({ userId, targetId: postId, target_type: "post", state: true });
+  } else {
+    const checkLikes = await Likes.findOne({
+      attributes: ["likeId", "state"],
+      where: { userId, targetId: postId, target_type: "post" }
+    });
+    console.log(checkLikes);
+    const likeState = checkLikes.dataValues.state;
+    await Likes.update(
+      {
+        state: !likeState
+      },
+      {
+        where: { userId, targetId: postId, target_type: "post" }
+      }
+    ).then(() => {
+      return res.redirect("back");
+    });
+  }
+});
+
+// 댓글 수정 등록
 mainRouter.get("/comments/:commentsId", [checkAuth, authMiddleware], async (req, res, next) => {
   const commentsId = req.params.commentsId;
-
   const comments = await Comments.findOne({
     where: { commentsId }
   });
   console.log(comments.dataValues);
-  res.cookie("accessToken", res.locals.accessToken).render("comments/edit.ejs", {
-    comments: comments.dataValues
+  res.cookie("accessToken", res.locals.accessToken);
+  res.render("comments/edit.ejs", {
+    comments: comments.dataValues,
+    currentUser: res.locals.currentUser
   });
 });
+// 유저 정보 수정
+mainRouter.get("/user/:userId", authMiddleware, async (req, res, next) => {
+  const { userId } = req.params;
 
-mainRouter.get("/user/:id", authMiddleware, async (req, res, next) => {
-  console.log("!");
-  const userId = res.locals.currentUser;
-  const postId = req.params.postId;
-
-  const { profile, region, nation } = req.body;
-
-  const user_info = await User_infos.findOne({
-    where: { userId: userId }
+  const userInfo = await User_infos.count({
+    where: {
+      userId: userId
+    }
   });
-  const userInfo = {
-    profile: null,
-    region: null,
-    nation: null
-  };
-  if (user_info) {
-    console.log(user_info);
+
+  if (userInfo === 0) {
+    const user_infos = new User_infos({
+      userId,
+      profile: null,
+      region: null,
+      nation: null
+    });
+    const temp = await user_infos.save();
   }
+
+  const user = await User_infos.findOne({
+    where: {
+      userId: userId
+    }
+  });
+  console.log(user.dataValues);
+  res.render("mypage", {
+    currentUser: userId,
+    userInfo: user.dataValues
+  });
 });
 
+// 회원가입
 mainRouter.get("/signup", (req, res) => {
   res.cookie("accessToken", res.locals.accessToken).render("auth/signup", {
     User: null
   });
 });
-
+// 로그인
 mainRouter.get("/login", (req, res) => {
   const accessToken = req.cookies.accessToken;
   const refreshToken = req.cookies.refreshToken;

@@ -11,22 +11,30 @@
               <div class="h2 mb-1">
                 <%= posts.title %>
               </div>
-              <%=currentUser %>
-                <%=posts.userId %>
-                  <% if (currentUser===posts.userId) { %>
-                    !!
-                    <button class="no-outline" type="button" data-bs-toggle="dropdown">
-                      <img src="/image/menu.png" height="30px">
-                    </button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item text-center" href="/posts/<%= posts.postId %>/edit">Edit</a>
-                      <form class="dropdown-item text-center" action="/api/posts/delete/<%=posts.postId%>"
-                        method="POST">
-                        <button class="no-outline" type="submit">Delete</button>
-                      </form>
-                    </div>
-                    <% } %>
+              <div>
+                <a id="postLike" href="/posts/<%=posts.postId%>/likes" class="btn" tabindex="-1" role="button"
+                  aria-disabled="true">
+                  <% if(postLike){%>
+                    <img src="/image/icon/favorite_FILL1.png" height="25px">
+                    <% }else{ %>
+                      <img src="/image/icon/favorite_FILL0.png" height="25px">
+                      <% } %>
+                </a>
+                <% if (currentUser===posts.userId) { %>
+                  <button class="no-outline" type="button" data-bs-toggle="dropdown">
+                    <img src="/image/menu.png" height="30px">
+                  </button>
+
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item text-center" href="/posts/<%= posts.postId %>/edit">Edit</a>
+                    <form class="dropdown-item text-center" action="/api/posts/delete/<%=posts.postId%>" method="POST">
+                      <button class="no-outline" type="submit">Delete</button>
+                    </form>
+                  </div>
+              </div>
+              <% } %>
             </div>
+
             <div class="small mb-3">
               <%= posts.createdAt %>
             </div>
@@ -69,22 +77,23 @@
                 <%= comments[key].text %>
               </p>
               <div class="d-flex justify-content-between">
-                <p class="m-3">
-                  좋아용 <%= comments[key].like %>
-                </p>
-                <% if( comments[key].userId===currentUser){ %>
-                  <button class="no-outline" type="button" data-bs-toggle="dropdown">
-                    <img src="/image/menu.png" height="30px">
-                  </button>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item text-center" href="/comments/<%= comments[key].commentsId %>">Edit</a>
-                    <form class="dropdown-item text-center"
-                      action="/api/posts/<%=posts.postId%>/comments/<%= comments[key].commentsId %>/delete"
-                      method="POST">
-                      <button class="no-outline" type="submit">Delete</button>
-                    </form>
-                  </div>
-                  <% } %>
+
+                <div class="me-3">
+                  <% if( comments[key].userId===currentUser){ %>
+                    <button class="no-outline" type="button" data-bs-toggle="dropdown">
+                      <img src="/image/menu.png" height="30px">
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item text-center" href="/comments/<%= comments[key].commentsId %>">Edit</a>
+                      <form class="dropdown-item text-center"
+                        action="/api/posts/<%=posts.postId%>/comments/<%= comments[key].commentsId %>/delete"
+                        method="POST">
+                        <button class="no-outline" type="submit">Delete</button>
+                      </form>
+                    </div>
+                    <% } %>
+                </div>
+
               </div>
             </div>
           </div>

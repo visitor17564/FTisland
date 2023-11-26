@@ -37,7 +37,7 @@ const authMiddleware = async (req, res, next) => {
     console.log("!!");
   }
   const newAccessToken = jwt.sign({ userId: getRedis }, accessTokenSecretKey, {
-    expiresIn: "30s"
+    expiresIn: "6h"
   });
   res.locals.currentUser = getRedis;
   console.log(newAccessToken);

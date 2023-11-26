@@ -5,7 +5,6 @@ module.exports = {
     await queryInterface.createTable("User_infos", {
       userId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
         references: {
@@ -24,9 +23,7 @@ module.exports = {
       nation: {
         type: Sequelize.STRING
       },
-      follow: {
-        type: Sequelize.STRING
-      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
