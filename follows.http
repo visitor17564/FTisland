@@ -6,10 +6,10 @@ POST {{port}}/api/auth/signup
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "password": "test123",
-  "confirmPassword": "test123",
-  "username": "관리자"
+  "email": "visitor17564@kakao.com",
+  "password": "123456",
+  "confirmPassword": "123456",
+  "username": "정창일"
 }
 
 ### 로그인

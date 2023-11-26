@@ -18,16 +18,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER
       },
       profile: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING
       },
       region: {
         type: DataTypes.STRING
       },
       nation: {
-        type: DataTypes.STRING
-      },
-      follow: {
         type: DataTypes.STRING
       },
       createdAt: {
