@@ -6,7 +6,7 @@ const authRouter = require("./routes/auth.js");
 const mypageRouter = require("./routes/mypage.js");
 const mainRouter = require("./routes/main.router.js");
 const followRouter = require("./routes/follows.js");
-const postLikeRouter = require("./routes/post_likes.js");
+
 const commentRouter = require("./routes/comments.js");
 const { errorHandler } = require("./middlewares/error-handler.js");
 
@@ -16,12 +16,18 @@ const app = express();
 const port = 3000;
 
 // middleware
+app.use(
+  express.urlencoded({
+    extended: false
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
+  res.locals.accessToken = req.cookies.accessToken;
   next();
 });
 
@@ -29,9 +35,9 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 const publicDirectoryPath = path.join(__dirname, "public");
 app.use(express.static(publicDirectoryPath));
-const temp = ["서울", "경기", "인천", "강원"];
+const temp = ["전체", "서울", "경기", "인천", "강원"];
 // router middleware
-app.use("/api", [authRouter, mypageRouter, postsRouter, followRouter, postLikeRouter, commentRouter]);
+app.use("/api", [authRouter, mypageRouter, postsRouter, followRouter, commentRouter]);
 app.use("/", mainRouter);
 
 app.use((err, req, res, next) => {

@@ -1,120 +1,93 @@
 const express = require("express");
 const router = express.Router();
-const { Posts, Users, Comments } = require("../models");
-const Post = require("../models/posts");
+const { Posts } = require("../models");
+const multer = require("multer");
+const path = require("path");
+
 const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
 
+const storageEngine = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, path.join(__dirname, "../public/image"));
+  },
+  filename: (req, file, callback) => {
+    callback(null, file.originalname);
+  }
+});
+const upload = multer({ storage: storageEngine }).single("image");
+
 //여행지 등록
-router.post("/posts", [checkAuth, authMiddleware], async (req, res) => {
+router.post("/posts", [checkAuth, authMiddleware, upload], async (req, res) => {
   const { title, region, contents } = req.body;
+  const image = req.file ? req.file.filename : "";
+  console.log(title, region, contents, image);
+
   if (!title || !region || !contents) {
     return res.status(400).json({
       success: false,
       message: "데이터형식이 올바르지 않습니다."
     });
   }
-  const { userId } = req.user;
+
+  const userId = res.locals.currentUser;
   const post = new Posts({
     userId,
+    subtitle: image,
     title,
     region,
     contents,
     state: "true"
   });
+
   const temp = await post.save();
   if (!temp) {
     next(new Error("postRegisterError"));
   }
+
   res.redirect("/posts");
 });
 
 //관광지 수정
-router.put("/posts/:postId", authMiddleware, async (req, res) => {
-  let { userId } = req.user;
-  const userId2 = userId;
-  try {
-    const postId = req.params.postId;
-    const { title, subtitle, region, contents } = req.body;
-    if (!title || !subtitle || !region || !contents) {
-      return res.status(400).json({
-        success: false,
-        message: "데이터형식이 올바르지 않습니다."
-      });
-    }
-    const post = await Posts.findOne({
-      where: { postId }
-    });
-    const { userId } = post;
-    if (userId2 !== userId) {
-      return res.status(401).json({
-        success: false,
-        message: "관광지 정보를 수정할 권한이 존재하지 않습니다."
-      });
-    }
-    const updatedAt = new Date();
+router.post("/posts/:postId", authMiddleware, async (req, res) => {
+  const postId = req.params.postId;
+  const { title, region, contents } = req.body;
 
-    Posts.update(
-      {
-        title,
-        subtitle,
-        region,
-        contents,
-        updatedAt
-      },
-      {
-        where: { postId }
-      }
-    ).then(() => {
-      return res.status(200).json({
-        success: true,
-        message: "관광지 정보를 수정하였습니다."
-      });
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
+  if (!title || !region || !contents) {
+    return res.status(400).json({
       success: false,
-      message: "서버 오류."
+      message: "데이터형식이 올바르지 않습니다."
     });
   }
+
+  Posts.update(
+    {
+      title,
+      region,
+      contents
+    },
+    {
+      where: { postId }
+    }
+  ).then(() => {
+    return res.redirect(`/posts/${postId}`);
+  });
 });
 
 //관광지 삭제
-router.delete("/posts/:postId", authMiddleware, async (req, res) => {
-  let { userId } = req.user;
-  const userId2 = userId;
-  try {
-    const postId = req.params.postId;
-    const post = await Posts.findOne({
-      where: { postId }
-    });
-    if (!post) {
-      return res.status(500).json({
-        success: false,
-        message: "관광지 조회에 실패 하였습니다."
-      });
-    }
-    const { userId } = post;
-    if (userId2 !== userId) {
-      return res.status(401).json({
-        success: false,
-        message: "관광지를 삭제할 권한이 존재하지 않습니다."
-      });
-    }
-    Posts.destroy({
-      where: { postId }
-    }).then(() => {
-      return res.status(200).json({
-        success: false,
-        message: "관광지 정보를 삭제하였습니다."
-      });
-    });
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      message: "서버오류."
-    });
+router.post("/posts/delete/:postId", authMiddleware, async (req, res, next) => {
+  // 권한 미들 웨어 추가
+  const postId = req.params.postId;
+  const post = await Posts.findOne({
+    where: { postId }
+  });
+  if (!post) {
+    next(new Error("NotFoundPost"));
   }
+  Posts.destroy({
+    where: { postId }
+  }).then(() => {
+    return res.redirect("/posts");
+  });
 });
 
 module.exports = router;

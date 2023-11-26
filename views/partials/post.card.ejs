@@ -1,0 +1,19 @@
+<a class="card mb-3" href="/posts/<%=post.dataValues.postId%>">
+  <% if(post.subtitle){ %>
+    <img src="/image/<%= post.dataValues.subtitle %>" class="w-100 " alt="..." />
+    <% } else{ %>
+      <img src="/image/test.jpg" class="w-100" alt="..." />
+
+      <% } %>
+        <div class="card-body bord">
+          <div class="cartd-title fw-bold mb-3">
+            <%= post.dataValues.title %>
+          </div>
+          <p class="card-text">
+            <%= post.dataValues.contents %>
+          </p>
+        </div>
+</a>
+
+<script>
+</script>

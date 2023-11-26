@@ -11,157 +11,31 @@ const { authMiddleware } = require("../middlewares/auth-middleware");
 const router = express.Router();
 
 // 사용자 정보 생성 API
-router.post("/user/me", [
-  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
-  body("profile").notEmpty().trim().withMessage("프로필이 비어있습니다."),
-  body("region").notEmpty().trim().withMessage("지역이 비어있습니다."),
-  body("nation").notEmpty().trim().withMessage("국가가 비어있습니다."),
-  body("follow").notEmpty().trim().withMessage("팔로우가 비어있습니다.")
+router.post(
+  "/user/:userId",
+  [
+    // 빈 입력란 여부 체크 및 앞뒤 공백 제거
+    body("region").notEmpty().trim().withMessage("지역이 비어있습니다."),
+    body("nation").notEmpty().trim().withMessage("국가가 비어있습니다.")
+  ],
+  validatorErrorCheck,
+  authMiddleware,
+  async (req, res) => {
+    const userId = res.locals.currentUser;
+    const { region, nation } = req.body;
 
-], validatorErrorCheck, authMiddleware, async (req, res) => {
-  try {
-    const { userId } = req.user;
-    const { profile, region, nation, follow } = req.body;
-
-    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
-    const user = await Users.findOne({
-      where: { userId: userId }
+    const user = {
+      userId,
+      region,
+      nation
+    };
+    await User_infos.update(user, {
+      where: { userId }
+    }).then(() => {
+      return res.redirect(`/posts`);
     });
-    
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        errorMessage: "사용자를 찾을 수 없습니다."
-      });
-    }
-
-    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
-    const user_info = await User_infos.findOne({
-      where: { userId: userId }
-    });
-
-    // 사용자 정보가 존재하지 않으면 새로운 사용자 정보를 생성한다.
-    if (!user_info) {
-      await User_infos.create({
-        userId: userId,
-        profile: profile,
-        region: region,
-        nation: nation,
-        follow: follow
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "프로필 생성이 완료되었습니다.",
-      data: user_info
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      errorMessage: "예기치 못한 오류가 발생하였습니다."
-    });
-    console.log(err);
   }
-});
-
-// 사용자 정보 조회 API
-router.get("/user/me", authMiddleware, async (req, res) => {
-  try {
-    const { userId } = req.user;
-
-    // user와 user_info의 id가 일치하는 것을 찾는다.
-    const user = await Users.findOne({
-      where: { userId: userId },
-      // user모델에서 password 부분을 제외한다.
-      attributes: { exclude: ["password"] },
-      // user_infos모델의 프로필, 지역, 국가, 팔로우를 선택하고 포함한다.
-      include: [{ model: User_infos, attributes: ["profile", "region", "nation", "follow"] }]
-    });
-
-    // 사용자가 없는 경우
-    if (!user) {
-      res.status(404).send({
-        success: false,
-        errorMessage: "사용자 조회에 실패하였습니다."
-      });
-    }
-
-    // 사용자 정보 보여주기
-    return res.status(200).json({
-      success: true,
-      data: user
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      errorMessage: "예기치 못한 오류가 발생하였습니다."
-    });
-    console.log(err);
-  }
-});
-
-// 사용자 정보 수정 API
-router.put("/user/me", [
-  // 빈 입력란 여부 체크 및 앞뒤 공백 제거
-  body("profile").notEmpty().trim().withMessage("프로필이 비어있습니다."),
-  body("region").notEmpty().trim().withMessage("지역이 비어있습니다."),
-  body("nation").notEmpty().trim().withMessage("국가가 비어있습니다."),
-  body("follow").notEmpty().trim().withMessage("팔로우가 비어있습니다."),
-  body("confirmPassword").notEmpty().trim().withMessage("확인용 비밀번호가 비어있습니다.")
-
-], validatorErrorCheck, authMiddleware, async (req, res) => {
-  try {
-    const { userId } = req.user;
-    const { profile, region, nation, follow, confirmPassword } = req.body;
-    
-    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자를 찾는다.
-    const user = await Users.findOne({
-      where: { userId: userId }
-    });
-
-    // 구조분해할당으로 user의 password를 가져온다.
-    const { password } = user
-    
-    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
-    const user_info = await User_infos.findOne({
-      where: { userId: userId }
-    });
-
-    // 사용자 정보가 존재하지 않는 경우
-    if (!user_info) {
-      res.status(404).send({
-        success: false,
-        errorMessage: "사용자 정보가 존재하지 않습니다."
-      });
-    }
-
-    // 비밀번호 비교
-    const isValidPass = await bcrypt.compare(confirmPassword, password);
-    console.log(isValidPass)
-    // 비밀번호가 서로 일치하지 않는 경우
-    if (!isValidPass) {
-      return res.status(401).json({
-        success: false,
-        errorMessage: "비밀번호가 서로 일치하지 않습니다."
-      });
-    }
-
-    // 비밀번호가 일치할 경우 사용자 정보 수정
-    await User_infos.update({ profile, region, nation, follow }, { where: { userId: userId } });
-
-    res.status(200).json({
-      success: true,
-      message: "사용자 정보 수정이 완료되었습니다."
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "예기치 못한 오류가 발생하였습니다."
-    });
-    console.log(err);
-  }
-});
+);
 
 // 사용자 및 정보 삭제
 router.delete("/user/me", authMiddleware, async (req, res) => {
@@ -175,7 +49,7 @@ router.delete("/user/me", authMiddleware, async (req, res) => {
     });
 
     // 구조분해할당으로 user의 password를 가져온다.
-    const { password } = user
+    const { password } = user;
 
     // 사용자가 없는 경우
     if (!user) {

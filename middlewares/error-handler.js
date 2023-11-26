@@ -1,4 +1,5 @@
 function errorHandler(errorName, req, res) {
+  console.log(errorName);
   switch (errorName) {
     // auth.js 에러들
     case "ExistingEmail":
@@ -16,6 +17,7 @@ function errorHandler(errorName, req, res) {
 
     // myPage.js 에러들
     case "UnknownUser":
+    case "NotPostFound":
       return res.status(404).send({
         errorMessage: "사용자정보가 없습니다."
       });

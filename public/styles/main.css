@@ -14,3 +14,15 @@
   background-color: transparent;
   border-width: 0px;
 }
+
+.region:active {
+  padding: auto;
+}
+.comment-section {
+  width: 100%;
+  border: none;
+  padding: 10px 20px;
+  margin: 4px 0px;
+  border-radius: 4px;
+  background-color: #f7f7f7;
+}
