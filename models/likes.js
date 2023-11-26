@@ -50,6 +50,10 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE
+      },
+      state: {
+        type: Sequelize.DataTypes.BOOLEAN,
+        defaultValue: true
       }
     },
     {
