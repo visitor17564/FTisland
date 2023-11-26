@@ -5,7 +5,6 @@ module.exports = {
     await queryInterface.createTable("User_infos", {
       userId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
         references: {
@@ -15,8 +14,7 @@ module.exports = {
         onDelete: "CASCADE"
       },
       profile: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING
       },
       region: {
         type: Sequelize.STRING
@@ -34,6 +32,18 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      introduce: {
+        type: Sequelize.STRING
+      },
+      mbti: {
+        type: Sequelize.STRING
+      },
+      githubUrl: {
+        type: Sequelize.STRING
+      },
+      blogUrl: {
+        type: Sequelize.STRING
       }
     });
   },
