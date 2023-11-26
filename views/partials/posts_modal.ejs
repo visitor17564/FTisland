@@ -5,7 +5,7 @@
         <h5>여행정보 작성</h5>
         <button type="button" class="btn-close close" data-bs-dismiss="modal"></button>
       </div>
-      <form method="POST" action="/api/posts">
+      <form method="POST" action="/api/posts" enctype="multipart/form-data">
         <div class="modal-body">
           <div class="form-group form-floating mb-3">
             <select name="region" class="form-select" id="region" aria-label="Floating label select example" required>
@@ -24,6 +24,9 @@
             <textarea name="contents" class="form-control" placeholder="여행정보를 적어주세요." id="contents"
               style="height: 100px" required></textarea>
             <label for="Post_contents">Contents</label>
+          </div>
+          <div class="form-group mt-1">
+            <input class="form-control" type="file" name="image">
           </div>
         </div>
         <div class="modal-footer">

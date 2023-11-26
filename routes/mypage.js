@@ -21,18 +21,18 @@ router.post(
   validatorErrorCheck,
   authMiddleware,
   async (req, res) => {
-    console.log("!!");
-    const { userId } = req.user;
+    const userId = res.locals.currentUser;
     const { region, nation } = req.body;
 
     const user = {
+      userId,
       region,
       nation
     };
     await User_infos.update(user, {
       where: { userId }
     }).then(() => {
-      return res.redirect(`/user/${userId}`);
+      return res.redirect(`/posts`);
     });
   }
 );

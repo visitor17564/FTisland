@@ -9,43 +9,43 @@ router.post("/posts/:postId/comments", authMiddleware, async (req, res, next) =>
   const { text } = req.body;
   const { postId } = req.params;
 
-  try {
-    const post = await Posts.findByPk(postId);
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "포스트를 찾을 수 없습니다."
-      });
-    }
-
-    await Comments.create({ text, userId, postId });
-    res.status(201).json({
-      success: true,
-      message: "댓글이 등록되었습니다."
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "서버 오류."
-    });
+  const post = await Posts.findByPk(postId);
+  if (!post) {
+    next(new Error("NotFoundPost"));
   }
+
+  const addComments = await Comments.create({ text, userId, postId });
+  if (!addComments) {
+    next(new Error("AddCommentsError"));
+  }
+  res.redirect(`/posts/${post.postId}`);
 });
 
-//댓글 조회
-router.get("/posts/:postId/comments", async (req, res) => {
-  const { postId } = req.params;
-  const comments = await Comments.findAll({
-    where: { postId }
+//댓글 수정
+router.post("/posts/:postId/comments/:commentsId", authMiddleware, async (req, res, next) => {
+  const { commentsId, postId } = req.params;
+  const { text } = req.body;
+  console.log("!");
+  await Comments.update(
+    { text },
+    {
+      where: {
+        commentsId
+      }
+    }
+  );
+
+  return res.redirect(`/posts/${postId}`);
+});
+
+// 삭제
+router.post("/posts/:postId/comments/:commentsId/delete", authMiddleware, async (req, res, next) => {
+  const { commentsId, postId } = req.params;
+  Comments.destroy({
+    where: { commentsId }
+  }).then(() => {
+    return res.redirect(`/posts/${postId}`);
   });
-
-  if (!comments) {
-    return res.status(404).json({
-      success: false,
-      message: "댓글을 조회할 수 없습니다."
-    });
-  }
-
-  res.send(comments);
 });
 
 module.exports = router;

@@ -40,7 +40,6 @@ const authMiddleware = async (req, res, next) => {
     expiresIn: "6h"
   });
   res.locals.currentUser = getRedis;
-  console.log(newAccessToken);
   res.locals.accessToken = newAccessToken;
   next();
 };

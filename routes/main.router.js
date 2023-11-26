@@ -11,16 +11,15 @@ mainRouter.get("/", (req, res) => {
 
 // 메인페이지
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
-  const cookieAccessToken = req.cookies.accessToken;
   const sort = req.query.sort ? req.query.sort : "DESC";
   const userId = res.locals.currentUser;
-  const accessToken = res.locals.accessToken;
 
   const posts = await Posts.findAll({
     attributes: [
       "userId",
       "postId",
       "title",
+      "subtitle",
       "region",
       "contents",
       "like",
@@ -96,23 +95,26 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
         attributes: ["username"],
         where: comments[key].dataValues.userId
       });
-
       const newComment = {
         ...comments[key].dataValues,
         username: name.dataValues.username
       };
-
       newComments.push(newComment);
     }
   }
   const newPost = {
     ...post.dataValues
   };
-
-  const postLike = await Likes.findOne({
-    attributes: ["state"],
-    where: { targetId: postId }
+  const count = await Likes.count({
+    where: { userId, targetId: postId, target_type: "post" }
   });
+  let postLike = false;
+  if (count !== 0) {
+    postLike = await Likes.findOne({
+      attributes: ["state"],
+      where: { targetId: postId }
+    });
+  }
 
   res.cookie("accessToken", res.locals.accessToken);
   res.render("post_detail/", {
@@ -120,7 +122,7 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
     currentUsername: newPost.username,
     posts: newPost,
     comments: newComments,
-    postLike: postLike.dataValues.state
+    postLike: postLike ? postLike.dataValues.state : false
   });
 });
 
@@ -160,10 +162,11 @@ mainRouter.get("/posts/:postId/edit", [checkAuth, authMiddleware], async (req, r
 mainRouter.get("/posts/:postId/likes", [checkAuth, authMiddleware], async (req, res) => {
   const userId = res.locals.currentUser;
   const { postId } = req.params;
-
+  console.log(userId, postId);
   const countLikes = await Likes.count({
     where: { userId, targetId: postId, target_type: "post" }
   });
+
   if (countLikes === 0) {
     await Likes.create({ userId, targetId: postId, target_type: "post", state: true });
   } else {
@@ -200,7 +203,7 @@ mainRouter.get("/comments/:commentsId", [checkAuth, authMiddleware], async (req,
   });
 });
 // 유저 정보 수정
-mainRouter.get("/user/:userId", authMiddleware, async (req, res, next) => {
+mainRouter.get("/user/:userId", [checkAuth, authMiddleware], async (req, res, next) => {
   const { userId } = req.params;
 
   const userInfo = await User_infos.count({
@@ -224,7 +227,7 @@ mainRouter.get("/user/:userId", authMiddleware, async (req, res, next) => {
       userId: userId
     }
   });
-  console.log(user.dataValues);
+
   res.render("mypage", {
     currentUser: userId,
     userInfo: user.dataValues
