@@ -112,6 +112,18 @@ Content-Type: application/json
 GET {{port}}/api/posts/8/comments
 Content-Type: application/json
 
+### 댓글수정
+PUT {{port}}/api/posts/8/comments/2
+Content-Type: application/json
+
+{
+  "text": "8번글에 댓글 수정 테스트입니다"
+}
+
+### 댓글삭제
+DELETE {{port}}/api/posts/8/comments/2
+Content-Type: application/json
+
 
 // 팔로우기능
 ### 내가 팔로우하는 사람
