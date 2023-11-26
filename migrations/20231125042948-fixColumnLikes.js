@@ -6,7 +6,6 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.renameColumn("Likes", "UserId", "userId", { transaction });
-
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
