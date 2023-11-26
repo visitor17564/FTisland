@@ -1,6 +1,6 @@
 // import
 const jwt = require("jsonwebtoken");
-const { Users } = require("../models");
+const { Posts } = require("../models");
 const { redis } = require("../config/config");
 require("dotenv").config();
 
@@ -11,25 +11,66 @@ const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 // middleware
 const authMiddleware = async (req, res, next) => {
   const accessToken = req.cookies.accessToken;
-  jwt.verify(accessToken, accessTokenSecretKey, (err, user) => {
-    if (err) {
-      return res.redirect("/api/auth/refresh");
-    }
-    req.user = user;
+  const refreshToken = req.cookies.refreshToken;
+  const verifiedAccessToken = verifyAccessToken(accessToken);
+
+  if (verifiedAccessToken) {
+    res.locals.currentUser = verifiedAccessToken.userId;
     next();
+  }
+  const verifiedRefreshToken = verifyRefreshToken(refreshToken);
+  if (!verifiedRefreshToken) {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    return res.redirect("/login");
+  }
+
+  const getRedis = await redis.get(refreshToken);
+  if (!getRedis) {
+    console.log("DB에 없음");
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    return res.redirect("/login");
+  }
+
+  if (getRedis === verifiedAccessToken.userId) {
+    console.log("!!");
+  }
+  const newAccessToken = jwt.sign({ userId: getRedis }, accessTokenSecretKey, {
+    expiresIn: "30s"
   });
+  res.locals.currentUser = getRedis;
+  console.log(newAccessToken);
+  res.locals.accessToken = newAccessToken;
+  next();
 };
 
-// 로그인 상태 확인 검증값으로 바꿔야됨
+// token  확인
 const checkAuth = (req, res, next) => {
   const accessToken = req.cookies.accessToken;
   const refreshToken = req.cookies.refreshToken;
   if (accessToken && refreshToken) {
     next();
   } else {
-    res.redirect("/login");
+    return res.redirect("/login");
   }
 };
+
+function verifyAccessToken(accessTokenToken) {
+  try {
+    return jwt.verify(accessTokenToken, accessTokenSecretKey);
+  } catch (error) {
+    return false;
+  }
+}
+
+function verifyRefreshToken(refreshTokenToken) {
+  try {
+    return jwt.verify(refreshTokenToken, refreshTokenSecretKey);
+  } catch (error) {
+    return false;
+  }
+}
 
 module.exports = {
   authMiddleware,

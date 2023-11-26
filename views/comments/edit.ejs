@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+    <div class="container col-lg-8" style="width: 600px;">
+        <div class="card">
+            <h5 class="card-header">
+                댓글 수정하기
+            </h5>
+            <form method="POST" action="/api/posts/<%= comments.postId%>/comments/<%= comments.commentsId %>">
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label for="comments" class="mb-2">댓글</label>
+                        <input name="text" class="form-control" id="comments" value=<%=comments.text%> required>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <%- include('../partials/footer') %>

@@ -1,8 +1,8 @@
 const express = require("express");
 const mainRouter = express.Router();
-const { Posts, Users, User_infos } = require("../models");
-const temp = ["서울", "경기", "인천", "강원"];
+const { Posts, Users, User_infos, Comments, sequelize } = require("../models");
 
+const { regionEnum } = require("../config/enum.js");
 const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
 
 mainRouter.get("/", (req, res) => {
@@ -11,102 +11,181 @@ mainRouter.get("/", (req, res) => {
 
 // get all posts
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
-  const post = await Posts.findAll();
-  const user = req.user;
-  console.log("posts");
-  console.log(user);
-  if (!post) {
+  const cookieAccessToken = req.cookies.accessToken;
+  const sort = req.query.sort ? req.query.sort : "DESC";
+  const userId = res.locals.currentUser;
+  const accessToken = res.locals.accessToken;
+
+  console.log("쿠키", cookieAccessToken);
+  console.log("로컬", accessToken);
+  const posts = await Posts.findAll({
+    attributes: [
+      "userId",
+      "postId",
+      "title",
+      "region",
+      "contents",
+      "like",
+      [sequelize.col("username"), "username"],
+      "updatedAt"
+    ],
+    order: [["createdAt", sort]],
+    include: {
+      model: Users,
+      attributes: []
+    }
+  });
+  const username = await Users.findOne({
+    attributes: ["username"],
+    where: {
+      userId
+    }
+  });
+
+  if (!posts) {
     return res.status(500).json({
       success: false,
       message: "관광지를 조회할 수 없습니다."
     });
   }
 
+  res.cookie("accessToken", res.locals.accessToken);
   res.render("posts", {
-    regions: temp,
-    posts: post,
-    User: user
+    regions: regionEnum,
+    posts: posts,
+    currentUser: userId,
+    currentUsername: username.dataValues.username
   });
 });
 
 mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, next) => {
-  const { userId } = req.user;
+  const userId = res.locals.currentUser;
   const postId = req.params.postId;
-
+  const sort = req.query.sort ? req.query.sort : "DESC";
   const post = await Posts.findOne({
     where: { postId },
-    attributes: ["postId", "userId", "title", "subtitle", "region", "contents", "state", "createdAt"],
+    attributes: [
+      "postId",
+      "userId",
+      "title",
+      "subtitle",
+      "region",
+      "contents",
+      "state",
+      [sequelize.col("username"), "username"],
+      "createdAt"
+    ],
     include: [
       {
         model: Users,
-        attributes: ["email"]
+        attributes: []
       }
     ]
   });
-
   if (!post) {
     next(new Error(`NotPostFound`));
   }
 
-  const test = {
-    comment: {
-      userId: 8,
-      comments: "dsafadsf"
+  const comments = await Comments.findAll({
+    where: { postId },
+    attributes: ["commentsId", "postId", "userId", "text", "like", "updatedAt"],
+    order: [["createdAt", sort]]
+  });
+  const newComments = [];
+  if (comments) {
+    for (const comment of comments) {
+      const name = await Users.findOne({
+        attributes: ["username"],
+        where: comment.dataValues.userId
+      });
+      const newComment = {
+        ...comment.dataValues,
+        username: name.dataValues.username
+      };
+      newComments.push(newComment);
     }
+  }
+  const newPost = {
+    ...post.dataValues
   };
-
-  const comments = {
-    comment: test,
-    size: Object.keys(test).length
-  };
-
-  console.log(comments);
+  console.log(newPost);
+  console.log(userId);
+  res.cookie("accessToken", res.locals.accessToken);
   res.render("post_detail/", {
-    User: userId,
+    currentUser: userId,
+    currentUsername: newPost.username,
+    posts: newPost,
+    comments: newComments
+  });
+});
+
+mainRouter.get("/posts/:postId/edit", [checkAuth, authMiddleware], async (req, res, next) => {
+  // 포스트 작성자 검증 미들웨어 생성 고민해보자
+  const postId = req.params.postId;
+
+  const post = await Posts.findOne({
+    where: { postId },
+    attributes: [
+      "postId",
+      "userId",
+      "title",
+      "region",
+      "contents",
+      [sequelize.col("username"), "username"],
+      "createdAt"
+    ],
+    include: [
+      {
+        model: Users,
+        attributes: []
+      }
+    ]
+  });
+  const newPost = {
+    ...post.dataValues
+  };
+  console.log(newPost);
+  res.cookie("accessToken", res.locals.accessToken).render("post_detail/edit.ejs", {
     post: post.dataValues,
-    comments: comments
+    currentUser: res.locals.currentUser,
+    currentUsername: newPost.username
+  });
+});
+
+mainRouter.get("/comments/:commentsId", [checkAuth, authMiddleware], async (req, res, next) => {
+  const commentsId = req.params.commentsId;
+
+  const comments = await Comments.findOne({
+    where: { commentsId }
+  });
+  console.log(comments.dataValues);
+  res.cookie("accessToken", res.locals.accessToken).render("comments/edit.ejs", {
+    comments: comments.dataValues
   });
 });
 
 mainRouter.get("/user/:id", authMiddleware, async (req, res, next) => {
-  try {
-    const user = req.user;
-    console.log(user.userId);
-    const userId = user.userId;
-    const { profile, region, nation, follow } = req.body;
-    // 로그인한 사용자를 기반으로 userId가 일치하는 사용자의 정보를 찾는다.
+  console.log("!");
+  const userId = res.locals.currentUser;
+  const postId = req.params.postId;
 
-    const user_info = await User_infos.findOne({
-      where: { userId: userId }
-    });
+  const { profile, region, nation } = req.body;
 
-    // 사용자 정보가 존재하지 않으면 새로운 사용자 정보를 생성한다.
-    const temp = {
-      profile: "프로필테스트",
-      region: "지역테스트",
-      nation: "국가테스트",
-      follow: "팔로우테스트"
-    };
-    if (!user_info) {
-      await User_infos.create(temp);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "프로필 생성이 완료되었습니다.",
-      data: user_info
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      errorMessage: "예기치 못한 오류가 발생하였습니다."
-    });
-    console.log(err);
+  const user_info = await User_infos.findOne({
+    where: { userId: userId }
+  });
+  const userInfo = {
+    profile: null,
+    region: null,
+    nation: null
+  };
+  if (user_info) {
+    console.log(user_info);
   }
 });
 
 mainRouter.get("/signup", (req, res) => {
-  res.render("auth/signup", {
+  res.cookie("accessToken", res.locals.accessToken).render("auth/signup", {
     User: null
   });
 });
@@ -117,7 +196,7 @@ mainRouter.get("/login", (req, res) => {
   if (accessToken && refreshToken) {
     res.redirect("/posts");
   } else {
-    res.render("auth/login", {
+    res.cookie("accessToken", res.locals.accessToken).render("auth/login", {
       User: null
     });
   }

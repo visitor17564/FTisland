@@ -21,7 +21,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <% if (!User) { %>
+      <% if (!currentUser) { %>
         <div class="collapse navbar-collapse" id="navbarToggle">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item">
@@ -39,12 +39,12 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="/user/<%= User.userId %>">
-                유저네임
+              <a class="nav-link" href="/user/<%= currentUser.userId %>">
+                <%=currentUsername %>
               </a>
             </li>
             <li class="nav-item">
-              <form action="/api/auth/logout" method="POST">
+              <form action="/api/auth/logout" method="get">
                 <button type="submit" class="nav-link no-outline">
                   Logout
                 </button>

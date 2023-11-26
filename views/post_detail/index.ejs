@@ -5,16 +5,35 @@
         <div class="col-md-7">
           <img src="/image/test.jpg" class="w-100" alt="..." />
         </div>
-        <div class="col-6 col-md-5">
+        <div class="dropdown col-6 col-md-5">
           <div class="card-body" style="height: 100%;">
-
-            <div class="h2 mb-1">
-              <%= post.title %>
+            <div class="justify-content-between" style="display: flex;">
+              <div class="h2 mb-1">
+                <%= posts.title %>
+              </div>
+              <%=currentUser %>
+                <%=posts.userId %>
+                  <% if (currentUser===posts.userId) { %>
+                    !!
+                    <button class="no-outline" type="button" data-bs-toggle="dropdown">
+                      <img src="/image/menu.png" height="30px">
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item text-center" href="/posts/<%= posts.postId %>/edit">Edit</a>
+                      <form class="dropdown-item text-center" action="/api/posts/delete/<%=posts.postId%>"
+                        method="POST">
+                        <button class="no-outline" type="submit">Delete</button>
+                      </form>
+                    </div>
+                    <% } %>
             </div>
             <div class="small mb-3">
-              <%= post.createdAt %>
+              <%= posts.createdAt %>
             </div>
-            <div class="card-text" style="height: 80%;">할배가 적은 포스트 내용</div>
+            <div class="card-text" style="height: 80%;">
+              <%= posts.contents %>
+            </div>
+
           </div>
         </div>
       </div>
@@ -23,42 +42,55 @@
     <!-- 댓글창 구현 -->
 
     <div>
-      <form method="POST" action="/posts/<%= post.postId %>/comments">
+      <form method="POST" action="/api/posts/<%= posts.postId %>/comments">
         <div class="form-group mb-3">
           <label for="form-control" class="form-label">댓글 </label>
-          <input class="form-control" id="exampleFormControlInput1" placeholder="댓글을 작성해주세요.">
+          <input class="form-control" id="text" name="text" placeholder="댓글을 작성해주세요.">
           <div class="small ms-2"> 엔터를 눌러주세요.</div>
         </div>
       </form>
     </div>
     <hr class="mt-3">
 
-    <div class="collapse show" id="post<%= post.postId %>">
-      <% if (comments.size> 0) { %>
-        <% for (const key in comments.comment) { %>
+    <div class="collapse show" id="post<%= posts.postId %>">
+      <% if (comments.length> 0) { %>
+        <% for (const key in comments) { %>
           <div class="card-body comment-section mb-3">
             <div class="d-flex justify-content-between ">
-              <div class="font-weight-bold " style="padding: 3px;">
-                <%= key %>
+              <div class="font-weight-bold ms-3 mt-3" style="padding: 3px;">
+                <%= comments[key].username %>
               </div>
               <small class="align-self-end " style="margin-right: 10px;">
-                Fri Nov 24 2023 20:32:38 GMT+0900 (대한민국 표준시)
+                <%= comments[key].updatedAt %>
               </small>
             </div>
-            <!-- 댓글 내용  반복 시키자-->
-            <div class="d-flex justify-content-between mt-2">
-              <div>
-                <%- include('../partials/comment.card.ejs',{key:comments.comment[key], User : User}) %>
+            <div class="d-flex justify-content-between mt-1 ms-1 ">
+              <p class="m-3">
+                <%= comments[key].text %>
+              </p>
+              <div class="d-flex justify-content-between">
+                <p class="m-3">
+                  좋아용 <%= comments[key].like %>
+                </p>
+                <% if( comments[key].userId===currentUser){ %>
+                  <button class="no-outline" type="button" data-bs-toggle="dropdown">
+                    <img src="/image/menu.png" height="30px">
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item text-center" href="/comments/<%= comments[key].commentsId %>">Edit</a>
+                    <form class="dropdown-item text-center"
+                      action="/api/posts/<%=posts.postId%>/comments/<%= comments[key].commentsId %>/delete"
+                      method="POST">
+                      <button class="no-outline" type="submit">Delete</button>
+                    </form>
+                  </div>
+                  <% } %>
               </div>
             </div>
           </div>
           <% }} %>
-
-
     </div>
   </div>
-
-
 
 
 

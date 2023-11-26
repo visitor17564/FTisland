@@ -22,6 +22,7 @@ app.use(cookieParser());
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
+  res.locals.accessToken = req.cookies.accessToken;
   next();
 });
 
