@@ -2,25 +2,25 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("User_infos", {
-      userId: {
+    await queryInterface.createTable("Refresh_tokens", {
+      tokenId: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      userId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
           model: "Users",
           key: "userId"
         },
         onDelete: "CASCADE"
       },
-      profile: {
-        type: Sequelize.STRING
-      },
-      region: {
-        type: Sequelize.STRING
-      },
-      nation: {
-        type: Sequelize.STRING
+      token: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -29,22 +29,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      introduce: {
-        type: Sequelize.STRING
-      },
-      mbti: {
-        type: Sequelize.STRING
-      },
-      githubUrl: {
-        type: Sequelize.STRING
-      },
-      blogUrl: {
-        type: Sequelize.STRING
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("User_infos");
+    await queryInterface.dropTable("Refresh_tokens");
   }
 };
