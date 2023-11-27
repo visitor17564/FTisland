@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+
+  <div class="container ">
+    <div class=" row">
+      <div class="col-2">
+        <div class="card">
+          <div class="card-header">
+            MBTI
+          </div>
+          <ul class=" list-group list-group-flush">
+            <% regions.forEach((mbit)=> { %>
+              <%- include('../partials/postMBTI',{mbit : mbit }) %>
+                <% }) %>
+          </ul>
+        </div>
+      </div>
+      <div class="col-10  align-items-center">
+        <div class="mb-5">
+          <%- include('../partials/post_write.ejs') %>
+        </div>
+
+        <% posts.forEach((post)=> { %>
+          <div>
+            <%- include('../partials/post.card.ejs', {post : post}) %>
+          </div>
+          <% }) %>
+      </div>
+    </div>
+  </div>
+
+
+  <%- include('../partials/posts_modal') %>
+
+    <%- include('../partials/footer') %>

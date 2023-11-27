@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="modal-content">
+    <div class="header">
+      <h5>여행정보 수정</h5>
+    </div>
+
+    <form method="POST" action="/api/user/<%=currentUser%>">
+      <div class="modal-body">
+        <div class="form-group form-floating mb-3">
+          <input name="region" class="form-control" id="region" value="<%"="userInfo.region%" /> required>
+          <label for="region">region</label>
+        </div>
+
+        <div class="form-group form-floating mb-3">
+          <textarea name="nation" class="form-control" id="nation" style="height: 100px" required>
+<%=userInfo.nation%></textarea>
+          <label for="nation">nation</label>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <div></div>
+        <button type="submit" class="btn btn-primary">수정하기</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<a class="card mb-3" href="/posts/<%=post.dataValues.postId%>">
+  <% if(post.subtitle){ %>
+    <img src="/images/<%= post.dataValues.subtitle%>" class="w-100 h-60" alt="..." style="object-fit: contain;" />
+    <% } else{ %>
+      <img src="/images/test.jpg" class="w-100" alt="..." />
+
+      <% } %>
+        <div class="card-body bord">
+          <div class="cartd-title fw-bold mb-3">
+            <%= post.dataValues.title %>
+          </div>
+          <p class="card-text">
+            <%= post.dataValues.contents %>
+          </p>
+        </div>
+</a>

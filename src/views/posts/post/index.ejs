@@ -1,0 +1,113 @@
+<%- include('../../partials/header') %>
+  <div class="container">
+    <div class="card mb-3" style="max-width: 1320px">
+      <div class="row g-0">
+        <div class="col-md-7">
+          <% if(posts.subtitle){ %>
+            <img src="/images/<%= posts.subtitle %>" class="w-100" alt="..." />
+            <% } else{ %>
+              <img src="/images/test.jpg" class="w-100" alt="..." />
+
+              <% } %>
+        </div>
+        <div class="dropdown col-6 col-md-5">
+          <div class="card-body" style="height: 100%;">
+            <div class="justify-content-between" style="display: flex;">
+              <div class="h2 mb-1">
+                <%= posts.title %>
+              </div>
+
+              <div style="width: auto;">
+                <div>좋아요 <%=posts.like%>
+                </div>
+                <a id="postLike" href="/posts/<%=posts.postId%>/likes" class="btn" tabindex="-1" role="button"
+                  aria-disabled="true">
+                  <% if(postLike){%>
+                    <img src="/images/icon/favorite_FILL1.png" height="25px">
+                    <% }else{ %>
+                      <img src="/images/icon/favorite_FILL0.png" height="25px">
+                      <% } %>
+                </a>
+                <% if (currentUser===posts.userId) { %>
+                  <button class="no-outline" type="button" data-bs-toggle="dropdown">
+                    <img src="/images/menu.png" height="30px">
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item text-center" href="/posts/<%= posts.postId %>/edit">Edit</a>
+                    <form class="dropdown-item text-center" action="/api/posts/delete/<%=posts.postId%>" method="POST">
+                      <button class="no-outline" type="submit">Delete</button>
+                    </form>
+                  </div>
+                  <% } %>
+              </div>
+            </div>
+
+            <div class="small mb-3">
+              <%= posts.createdAt %>
+            </div>
+            <div class="card-text" style="height: 80%;">
+              <%= posts.contents %>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 댓글창 구현 -->
+
+    <div>
+      <form method="POST" action="/api/posts/<%= posts.postId %>/comments">
+        <div class="form-group mb-3">
+          <label for="form-control" class="form-label">댓글 </label>
+          <input class="form-control" id="text" name="text" placeholder="댓글을 작성해주세요.">
+          <div class="small ms-2"> 엔터를 눌러주세요.</div>
+        </div>
+      </form>
+    </div>
+    <hr class="mt-3">
+
+    <div class="collapse show" id="post<%= posts.postId %>">
+      <% if (comments.length> 0) { %>
+        <% for (const key in comments) { %>
+          <div class="card-body comment-section mb-3">
+            <div class="d-flex justify-content-between ">
+              <div class="font-weight-bold ms-3 mt-3" style="padding: 3px;">
+                <%= comments[key].username %>
+              </div>
+              <small class="align-self-end " style="margin-right: 10px;">
+                <%= comments[key].updatedAt %>
+              </small>
+            </div>
+            <div class="d-flex justify-content-between mt-1 ms-1 ">
+              <p class="m-3">
+                <%= comments[key].text %>
+              </p>
+              <div class="d-flex justify-content-between">
+
+                <div class="me-3">
+                  <% if( comments[key].userId===currentUser){ %>
+                    <button class="no-outline" type="button" data-bs-toggle="dropdown">
+                      <img src="/images/menu.png" height="30px">
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item text-center" href="/comments/<%= comments[key].commentsId %>">Edit</a>
+                      <form class="dropdown-item text-center"
+                        action="/api/posts/<%=posts.postId%>/comments/<%= comments[key].commentsId %>/delete"
+                        method="POST">
+                        <button class="no-outline" type="submit">Delete</button>
+                      </form>
+                    </div>
+                    <% } %>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <% }} %>
+    </div>
+  </div>
+
+  <%- include('../../partials/posts_modal.ejs') %>
+
+    <%- include('../../partials/footer') %>
