@@ -43,20 +43,6 @@ router.post(
         }
         return true;
       })
-      .withMessage("비밀번호가 서로 일치하지 않습니다."),
-
-    // 이메일 형식 체크
-    body("email").isEmail().isLength({ max: 30 }).withMessage("올바른 이메일 형식이 아닙니다."),
-
-    // 비밀번호 6자 이상, 일치 여부 확인
-    body("password").isLength({ min: 6 }).withMessage("비밀번호는 최소 6자 이상입니다."),
-    body("confirmPassword")
-      .custom((confirmPassword, { req }) => {
-        if (confirmPassword !== req.body.password) {
-          return false;
-        }
-        return true;
-      })
       .withMessage("비밀번호가 서로 일치하지 않습니다.")
   ],
   validatorErrorCheck,
