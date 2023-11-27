@@ -13,25 +13,51 @@ mainRouter.get("/", (req, res) => {
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
   const sort = req.query.sort ? req.query.sort : "DESC";
   const userId = res.locals.currentUser;
+  const queryRegion = req.query.region ? req.query.region : "전체";
+  let posts;
+  if (queryRegion === "전체") {
+    posts = await Posts.findAll({
+      attributes: [
+        "userId",
+        "postId",
+        "title",
+        "subtitle",
+        "region",
+        "contents",
+        "like",
+        [sequelize.col("username"), "username"],
+        "updatedAt"
+      ],
+      order: [["createdAt", sort]],
+      include: {
+        model: Users,
+        attributes: []
+      }
+    });
+  } else {
+    posts = await Posts.findAll({
+      attributes: [
+        "userId",
+        "postId",
+        "title",
+        "subtitle",
+        "region",
+        "contents",
+        "like",
+        [sequelize.col("username"), "username"],
+        "updatedAt"
+      ],
+      order: [["createdAt", sort]],
+      include: {
+        model: Users,
+        attributes: []
+      },
+      where: {
+        region: queryRegion
+      }
+    });
+  }
 
-  const posts = await Posts.findAll({
-    attributes: [
-      "userId",
-      "postId",
-      "title",
-      "subtitle",
-      "region",
-      "contents",
-      "like",
-      [sequelize.col("username"), "username"],
-      "updatedAt"
-    ],
-    order: [["createdAt", sort]],
-    include: {
-      model: Users,
-      attributes: []
-    }
-  });
   const username = await Users.findOne({
     attributes: ["username"],
     where: {
@@ -203,6 +229,7 @@ mainRouter.get("/comments/:commentsId", [checkAuth, authMiddleware], async (req,
     currentUser: res.locals.currentUser
   });
 });
+
 // 유저 정보 수정
 mainRouter.get("/user/:userId", [checkAuth, authMiddleware], async (req, res, next) => {
   const { userId } = req.params;
