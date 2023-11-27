@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       subtitle: {
         type: DataTypes.STRING
       },
-      mbit: {
+      mbti: {
         type: DataTypes.STRING
       },
       contents: {

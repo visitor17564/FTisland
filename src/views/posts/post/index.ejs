@@ -9,15 +9,16 @@
               <img src="/images/test.jpg" class="w-100" alt="..." />
 
               <% } %>
-        </div>
+        </div class="d-flex">
         <div class="dropdown col-6 col-md-5">
           <div class="card-body" style="height: 100%;">
             <div class="justify-content-between" style="display: flex;">
               <div class="h2 mb-1">
                 <%= posts.title %>
               </div>
-
-              <div style="width: auto;">
+              <div>
+                <div>구분 <%=posts.mbti%>
+                </div>
                 <div>좋아요 <%=posts.like%>
                 </div>
                 <a id="postLike" href="/posts/<%=posts.postId%>/likes" class="btn" tabindex="-1" role="button"

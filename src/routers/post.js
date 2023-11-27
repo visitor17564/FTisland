@@ -8,7 +8,6 @@ const router = express.Router();
 
 const storageEngine = multer.diskStorage({
   destination: (req, file, callback) => {
-    console.log(path.join(__dirname, `../public/images`));
     const uploadPath = path.join(__dirname, `../public/images`);
     callback(null, uploadPath);
   },
@@ -23,7 +22,6 @@ router.post("/posts", [checkAuth, authMiddleware, upload], async (req, res) => {
   const { title, mbti, contents } = req.body;
 
   const image = req.file ? req.file.filename : "";
-  console.log(image);
 
   if (!title || !mbti || !contents) {
     return res.status(400).json({
@@ -52,20 +50,22 @@ router.post("/posts", [checkAuth, authMiddleware, upload], async (req, res) => {
 
 //포스트 수정
 router.post("/posts/:postId", authMiddleware, async (req, res) => {
-  const postId = req.params.postId;
-  const { title, region, contents } = req.body;
-  Posts.update(
+  const { postId } = req.params;
+  const { title, mbti, contents } = req.body;
+  await Posts.update(
     {
       title,
-      region,
+      mbti,
       contents
     },
     {
-      where: { postId }
+      where: {
+        postId
+      }
     }
-  ).then(() => {
-    return res.redirect(`/posts/${postId}`);
-  });
+  );
+
+  return res.redirect(`/posts/${postId}`);
 });
 
 //포스트 삭제

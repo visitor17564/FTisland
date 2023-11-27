@@ -13,7 +13,7 @@ mainRouter.get("/", (req, res) => {
 mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => {
   const sort = req.query.sort ? req.query.sort : "DESC";
   const userId = res.locals.currentUser;
-  const queryRegion = req.query.region ? req.query.region : "전체";
+  const queryRegion = req.query.mbti ? req.query.mbti : "전체";
   let posts;
   if (queryRegion === "전체") {
     posts = await Posts.findAll({
@@ -22,7 +22,7 @@ mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => 
         "userId",
         "title",
         "subtitle",
-        "mbit",
+        "mbti",
         "contents",
         "like",
         [sequelize.col("username"), "username"],
@@ -41,7 +41,7 @@ mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => 
         "userId",
         "title",
         "subtitle",
-        "mbit",
+        "mbti",
         "contents",
         "like",
         [sequelize.col("username"), "username"],
@@ -53,7 +53,7 @@ mainRouter.get("/posts", [checkAuth, authMiddleware], async (req, res, next) => 
         attributes: []
       },
       where: {
-        mbit: queryRegion
+        mbti: queryRegion
       }
     });
   }
@@ -126,7 +126,7 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
       "userId",
       "title",
       "subtitle",
-      "mbit",
+      "mbti",
       "contents",
       "like",
       [sequelize.col("username"), "username"],
@@ -175,6 +175,7 @@ mainRouter.get("/posts/:postId", [checkAuth, authMiddleware], async (req, res, n
       where: { targetId: postId }
     });
   }
+
   res.cookie("accessToken", res.locals.accessToken);
   res.render("posts/post/", {
     currentUser: Number(userId),
@@ -190,7 +191,7 @@ mainRouter.get("/posts/:postId/edit", [checkAuth, authMiddleware], async (req, r
 
   const post = await Posts.findOne({
     where: { postId },
-    attributes: ["postId", "userId", "title", "subtitle", "mbit", "contents", "createdAt"]
+    attributes: ["postId", "userId", "title", "subtitle", "mbti", "contents", "createdAt"]
   });
   const newPost = {
     ...post.dataValues
@@ -226,7 +227,15 @@ mainRouter.get("/posts/:postId/likes", [checkAuth, authMiddleware], async (req, 
     where: { userId, targetId: postId, target_type: "post" }
   });
   if (countLikes === 0) {
+    const post = await Posts.findByPk(postId);
+    const like = post.dataValues.like;
     await Likes.create({ userId, targetId: postId, target_type: "post", state: true });
+    await Posts.update(
+      {
+        like: Number(like + 1)
+      },
+      { where: { postId } }
+    );
     return res.redirect("back");
   } else {
     const post = await Posts.findByPk(postId);
@@ -237,7 +246,6 @@ mainRouter.get("/posts/:postId/likes", [checkAuth, authMiddleware], async (req, 
       where: { userId, targetId: postId, target_type: "post" }
     });
     const likeState = checkLikes.dataValues.state;
-
     if (likeState) {
       await Posts.update(
         {
@@ -287,7 +295,7 @@ mainRouter.get("/login", (req, res) => {
 });
 
 // 로그아웃 API
-mainRouter.get("/auth/logout", (req, res, next) => {
+mainRouter.get("/logout", (req, res, next) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   res.redirect("/login");

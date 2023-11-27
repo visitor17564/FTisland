@@ -25,7 +25,7 @@ module.exports = {
       subtitle: {
         type: Sequelize.STRING
       },
-      mbit: {
+      mbti: {
         type: Sequelize.STRING
       },
       contents: {
