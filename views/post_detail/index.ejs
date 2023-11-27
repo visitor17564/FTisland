@@ -27,6 +27,7 @@
                       <% } %>
                 </a>
                 <% if (currentUser===posts.userId) { %>
+
                   <button class="no-outline" type="button" data-bs-toggle="dropdown">
                     <img src="/image/menu.png" height="30px">
                   </button>
@@ -36,8 +37,8 @@
                       <button class="no-outline" type="submit">Delete</button>
                     </form>
                   </div>
+                  <% } %>
               </div>
-              <% } %>
             </div>
 
             <div class="small mb-3">
