@@ -22,12 +22,16 @@ router.post(
   authMiddleware,
   async (req, res) => {
     const userId = res.locals.currentUser;
-    const { region, nation } = req.body;
+    const { region, nation, introduce, mbti, githubUrl, blogUrl } = req.body;
 
     const user = {
       userId,
       region,
-      nation
+      nation,
+      introduce,
+      mbti,
+      githubUrl,
+      blogUrl
     };
     await User_infos.update(user, {
       where: { userId }

@@ -1,6 +1,6 @@
 <a class="card mb-3" href="/posts/<%=post.dataValues.postId%>">
   <% if(post.subtitle){ %>
-    <img src="/image/<%= post.dataValues.subtitle %>" class="w-100 " alt="..." />
+    <img src="/image/<%= post.dataValues.subtitle %>" class="w-100 h-60" alt="..." style="object-fit: contain;" />
     <% } else{ %>
       <img src="/image/test.jpg" class="w-100" alt="..." />
 

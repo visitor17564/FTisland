@@ -6,7 +6,10 @@
 
           <% if(posts.subtitle){ %>
             <img src="/image/<%= posts.subtitle %>" class="w-100" alt="..." />
-            <% } %>
+            <% } else{ %>
+              <img src="/image/test.jpg" class="w-100" alt="..." />
+
+              <% } %>
         </div>
         <div class="dropdown col-6 col-md-5">
           <div class="card-body" style="height: 100%;">

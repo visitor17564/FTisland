@@ -1,7 +1,7 @@
 const express = require("express");
 const mainRouter = express.Router();
 const { Posts, Users, User_infos, Comments, Likes, sequelize } = require("../models");
-
+const passport = require("passport");
 const { regionEnum } = require("../config/enum.js");
 const { authMiddleware, checkAuth } = require("../middlewares/auth-middleware");
 
@@ -162,19 +162,20 @@ mainRouter.get("/posts/:postId/edit", [checkAuth, authMiddleware], async (req, r
 mainRouter.get("/posts/:postId/likes", [checkAuth, authMiddleware], async (req, res) => {
   const userId = res.locals.currentUser;
   const { postId } = req.params;
-  console.log(userId, postId);
+
   const countLikes = await Likes.count({
     where: { userId, targetId: postId, target_type: "post" }
   });
-
+  console.log(countLikes);
   if (countLikes === 0) {
     await Likes.create({ userId, targetId: postId, target_type: "post", state: true });
+    return res.redirect("back");
   } else {
     const checkLikes = await Likes.findOne({
       attributes: ["likeId", "state"],
       where: { userId, targetId: postId, target_type: "post" }
     });
-    console.log(checkLikes);
+
     const likeState = checkLikes.dataValues.state;
     await Likes.update(
       {
@@ -219,6 +220,7 @@ mainRouter.get("/user/:userId", [checkAuth, authMiddleware], async (req, res, ne
       region: null,
       nation: null
     });
+
     const temp = await user_infos.save();
   }
 
@@ -251,6 +253,13 @@ mainRouter.get("/login", (req, res) => {
       User: null
     });
   }
+});
+
+// 로그아웃 API
+mainRouter.get("/auth/logout", (req, res, next) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.redirect("/login");
 });
 
 module.exports = mainRouter;
